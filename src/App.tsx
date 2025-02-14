@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { login, logout, setChecked } from "./reducers/sessionSlice";
 import { RootState, AppDispatch } from "./store";
+import AppRoutes from "./routes";
+import { GlobalStyle } from "./utils/GlobalStyles";
 
 const App = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -29,8 +31,9 @@ const App = () => {
 
   return (
     <>
+      <GlobalStyle />
       <BrowserRouter>
-        {checked && <h1>Hello World!</h1>}
+        {checked && <AppRoutes />}
       </BrowserRouter>
     </>
   );
