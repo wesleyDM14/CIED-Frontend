@@ -74,7 +74,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, closeSidebar, logoutUser
                 })}
                 <LogoutContainer>
                     <FaPowerOff onClick={() => logoutUser(navigate, dispatch)} />
-                    <LogoutTitle>Logout</LogoutTitle>
+                    <LogoutTitle onClick={() => logoutUser(navigate, dispatch)}>Logout</LogoutTitle>
                 </LogoutContainer>
             </MenuContainer>
         </div>
