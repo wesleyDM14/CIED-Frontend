@@ -12,16 +12,15 @@ import {
     Title,
     TitleContainer,
 } from "./styles";
-import { FaPowerOff, FaTimes } from "react-icons/fa";
+import { FaPowerOff, FaTimes, FaUsers } from "react-icons/fa";
 import { RiCustomerServiceFill } from "react-icons/ri";
+import { TbUsersGroup } from "react-icons/tb";
+import { BiSolidUserRectangle } from 'react-icons/bi';
+import { LuLayoutDashboard } from 'react-icons/lu';
 import * as React from "react";
 import { hasPermission } from "../../utils/Permissions";
 import logo from '../../../public/favicon.ico';
-
-interface User {
-    accessToken: string | null;
-    userRole: string | null;
-}
+import { User } from "../../contexts/interfaces";
 
 interface SidebarProps {
     sidebarOpen: boolean;
@@ -39,7 +38,16 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, closeSidebar, logoutUser
         {
             title: 'Administrativo',
             items: [
-                { path: '/atendimento', title: 'Atendimento', icon: < RiCustomerServiceFill /> }
+                { path: '/atendimento', title: 'Atendimento', icon: <RiCustomerServiceFill /> },
+                { path: '/clientes', title: 'Clientes', icon: <TbUsersGroup /> },
+                { path: '/usuarios', title: 'Usuários', icon: <FaUsers /> },
+                { path: '/painel', title: 'Painel de Atendimento', icon: <LuLayoutDashboard /> },
+            ],
+        },
+        {
+            title: 'Pessoal',
+            items: [
+                { path: '/perfil', title: 'Perfil', icon: <BiSolidUserRectangle /> },
             ],
         },
     ];

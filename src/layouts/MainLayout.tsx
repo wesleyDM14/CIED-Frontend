@@ -6,13 +6,10 @@ import { logoutUser } from "../services/authService";
 import Sidebar from "../components/Sidebar";
 import * as React from "react";
 import { selectUser } from "../selectors/selectUser";
+import { PageProps } from "../contexts/interfaces";
 
-interface User {
-    accessToken: string | null;
-    userRole: string | null;
-}
 interface MainLayoutProps {
-    children: React.ReactElement<{ navigate: ReturnType<typeof useNavigate>, user: User | null }>;
+    children: React.ReactElement<Partial<PageProps>>;
 }
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
@@ -38,7 +35,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 dispatch={dispatch}
             />
             <main>
-                {React.cloneElement(children, { navigate, user })}
+                {React.isValidElement(children) &&
+                    React.cloneElement(children, { navigate, user } as Partial<PageProps>)}
             </main>
             <Sidebar
                 sidebarOpen={sidebarOpen}

@@ -5,11 +5,11 @@ interface RolePermissions {
 
 const rolePermissions: Record<string, RolePermissions> = {
     ADMIN: {
-        menus: ['/dashboard', '/atendimento'],
+        menus: ['/dashboard', '/atendimento', '/usuarios', '/clientes', '/perfil', '/painel'],
         actions: [],
     },
     OPERATOR: {
-        menus: ['/dashboard', '/atendimento'],
+        menus: ['/dashboard', '/atendimento', '/clientes', '/perfil', '/painel'],
         actions: [],
     }
 }
