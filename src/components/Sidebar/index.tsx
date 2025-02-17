@@ -19,9 +19,8 @@ import { hasPermission } from "../../utils/Permissions";
 import logo from '../../../public/favicon.ico';
 
 interface User {
-    accessToken: string;
-    userRole: string;
-    loginTime: number;
+    accessToken: string | null;
+    userRole: string | null;
 }
 
 interface SidebarProps {
