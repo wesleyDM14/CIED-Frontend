@@ -19,7 +19,7 @@ import { BiSolidUserRectangle } from 'react-icons/bi';
 import { LuLayoutDashboard } from 'react-icons/lu';
 import * as React from "react";
 import { hasPermission } from "../../utils/Permissions";
-import logo from '../../../public/favicon.ico';
+import logo from '../../assets/favicon.ico';
 import { User } from "../../contexts/interfaces";
 
 interface SidebarProps {

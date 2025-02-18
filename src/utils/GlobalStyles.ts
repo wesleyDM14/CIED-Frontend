@@ -1,4 +1,5 @@
 import { createGlobalStyle } from "styled-components";
+import { isSmallScreen } from "./Funtions";
 
 export const colors = {
     title: '#1A332D',
@@ -19,7 +20,18 @@ export const colors = {
 }
 
 export const ModalStyles = {
-
+    content: {
+        top: '50%',
+        left: '50%',
+        right: isSmallScreen() ? '10%' : 'auto',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)',
+        overflowY: 'auto' as const,
+        maxHeight: '600px',
+        padding: '0',
+        maxWidth: '90%'
+    }
 }
 
 export const GlobalStyle = createGlobalStyle`

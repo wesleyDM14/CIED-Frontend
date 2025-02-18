@@ -11,8 +11,8 @@ export interface PageProps {
 }
 
 export interface Cliente {
-    id: string;
-    name: string;
+    id?: string;
+    name?: string;
     email?: string;
     phone?: string;
 }

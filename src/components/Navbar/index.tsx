@@ -14,7 +14,7 @@ import {
 } from "./styles";
 import { FaBars, FaPowerOff } from "react-icons/fa";
 import { colors } from "../../utils/GlobalStyles";
-import logo from '../../../public/favicon.ico';
+import logo from '../../assets/favicon.ico';
 import userImg from '../../assets/user.png';
 import { AppDispatch } from "../../store";
 

@@ -229,6 +229,12 @@ export const Limitador = styled.div`
 export const FormInputLabelRequired = styled.p`
     font-weight: 600;
     margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+
+    svg {
+        margin-right: 5px;
+    }
 
     &::after{
         display: inline-block;
@@ -241,6 +247,12 @@ export const FormInputLabelRequired = styled.p`
 export const FormInputLabel = styled.p`
     font-weight: 600;
     margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+
+    svg{
+        margin-right: 5px;
+    }
 `;
 
 export const SubItensContainer = styled.div`
@@ -278,6 +290,7 @@ export const SubmitButton = styled.button`
 
     &:hover{
         background-color: ${colors.hover};
+        color: ${colors.mainText};
     }
 
     @media only screen and (max-width: 978px){
@@ -415,3 +428,4 @@ export const DeleteButtonContainer = styled.div`
         flex-direction: column;
     }
 `;
+
