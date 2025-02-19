@@ -170,7 +170,7 @@ export const UserListContainer = styled.div`
 
 export const UserListHeader = styled.div`
     display: grid;
-    grid-template-columns: 3fr 1fr;
+    grid-template-columns: 3fr 0.5fr;
     max-width: 100%;
     margin-top: 15px;
     padding: 10px;
@@ -213,7 +213,7 @@ export const FormInputArea = styled.div`
     margin-bottom: 20px;
 
     @media only screen and (max-width: 978px){
-        width: 90%;
+        width: 95%;
         margin-bottom: 5px;
     }
 `;
@@ -329,7 +329,7 @@ export const BackButton = styled.button`
 
 export const SingleUser = styled.div`
     display: grid;
-    grid-template-columns: 3fr 1fr;
+    grid-template-columns: 3fr 0.5fr;
     height: 50px;
     max-width: 100%;
     align-items: center;

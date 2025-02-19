@@ -18,6 +18,23 @@ export const getUsuarios = async (user: User, setUsuarios: (usuarios: Usuario[])
     });
 }
 
+export const getProfile = async (user: User, setProfile: (profile: Usuario) => void, setLoading: (loading: boolean) => void) => {
+    await axios.get(`${import.meta.env.VITE_BASE_URL}/api/user/profile`, {
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${user.accessToken}`
+        }
+    }).then((response) => {
+        const { data } = response;
+        setProfile(data);
+    }).catch((err) => {
+        console.error(err.response.data.error);
+        window.alert(err.response.data.error);
+    }).finally(() => {
+        setLoading(false);
+    });
+}
+
 export const createUser = async (usuario: Usuario, user: User, setLoading: (loading: boolean) => void, setFieldError: (field: string, message: string) => void, setSubmitting: (submitting: boolean) => void, closeAddModal: () => void) => {
     await axios.post(`${import.meta.env.VITE_BASE_URL}/api/user/create`, usuario, {
         headers: {
@@ -38,7 +55,7 @@ export const createUser = async (usuario: Usuario, user: User, setLoading: (load
     });
 }
 
-export const updateUser = async (usuario: Usuario, user: User, setLoading: (loading: boolean) => void, setFieldError: (field: string, message: string) => void, setSubmitting: (submitting: boolean) => void, closeEditModal: () => void) => {
+export const updateUser = async (usuario: Usuario, user: User, setLoading: (loading: boolean) => void, setFieldError: (field: string, message: string) => void, setSubmitting: (submitting: boolean) => void, closeEditModal?: () => void) => {
     await axios.put(`${import.meta.env.VITE_BASE_URL}/api/user/user/${usuario.email}`, usuario, {
         headers: {
             "Content-Type": "application/json",
@@ -48,7 +65,9 @@ export const updateUser = async (usuario: Usuario, user: User, setLoading: (load
         const { data } = response;
         window.alert(data.message);
         setLoading(true);
-        closeEditModal();
+        if (closeEditModal) {
+            closeEditModal();
+        }
     }).catch((err) => {
         console.error(err.response.data.error);
         setFieldError('email', err.response.data.error);
