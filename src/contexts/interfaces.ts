@@ -5,6 +5,12 @@ export interface User {
     userRole: string | null;
 }
 
+export interface Usuario {
+    id?: string;
+    email?: string;
+    password?: string;
+}
+
 export interface PageProps {
     navigate?: ReturnType<typeof useNavigate>;
     user?: { accessToken: string | null; userRole: string | null };
@@ -15,4 +21,5 @@ export interface Cliente {
     name?: string;
     email?: string;
     phone?: string;
+    address?: string;
 }

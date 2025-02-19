@@ -15,14 +15,16 @@ import {
     FormInputLabel,
     FormInputLabelRequired,
     IconWrapper,
+    Limitador,
     NoContentActionContainer,
     NoContentContainer,
     StyledFormArea,
+    SubItensContainer,
     SubmitButton,
     TextContent,
 } from "./styles";
 import Loading from "../../components/Loading";
-import { FaFileInvoice, FaPhoneAlt, FaPlus, FaPlusCircle, FaUsers } from "react-icons/fa";
+import { FaFileInvoice, FaMapMarkedAlt, FaPhoneAlt, FaPlus, FaPlusCircle, FaUsers } from "react-icons/fa";
 import { MdAlternateEmail, MdDriveFileRenameOutline } from "react-icons/md";
 import { Cliente, PageProps } from "../../contexts/interfaces";
 import SearchBar from "../../components/SearchBar";
@@ -36,6 +38,11 @@ import { ThreeDots } from "react-loader-spinner";
 import ClientList from "./clientList";
 
 const Clientes: React.FC<PageProps> = ({ navigate, user }) => {
+
+    const rootElement = document.getElementById('root');
+    if (rootElement) {
+        Modal.setAppElement(rootElement);
+    }
 
     const [clients, setClients] = useState<Cliente[]>([]);
 
@@ -122,12 +129,14 @@ const Clientes: React.FC<PageProps> = ({ navigate, user }) => {
                             name: '',
                             email: '',
                             phone: '',
+                            address: '',
                         }}
                         validationSchema={
                             Yup.object({
                                 name: Yup.string().required('Nome é obrigatório'),
                                 email: Yup.string().email('Digite um email válido'),
                                 phone: Yup.string().matches(/^\d{11}$/, 'Telefone inválido'),
+                                address: Yup.string(),
                             })
                         }
                         onSubmit={(values, { setSubmitting, setFieldError }) => {
@@ -156,24 +165,34 @@ const Clientes: React.FC<PageProps> = ({ navigate, user }) => {
                                                 autoComplete='email'
                                             />
                                         </FormInputArea>
-                                        <FormInputArea>
-                                            <FormInputLabel><FaPhoneAlt /> Telefone</FormInputLabel>
-                                            <MaskedInputComponent
-                                                name='phone'
-                                                type='text'
-                                                mask={['(', /[0-9]/, /[0-9]/, ')', /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/, '-', /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/]}
-                                                value={values.phone}
-                                                placeholder='Telefone do Cliente'
-                                                autoComplete='tel'
-                                            />
-                                        </FormInputArea>
+                                        <SubItensContainer>
+                                            <Limitador>
+                                                <FormInputArea>
+                                                    <FormInputLabel><FaMapMarkedAlt />Cidade</FormInputLabel>
+                                                    <FormInput
+                                                        type='text'
+                                                        name='address'
+                                                        placeholder='Cidade do Cliente'
+                                                        autoComplete='address'
+                                                    />
+                                                </FormInputArea>
+                                            </Limitador>
+                                            <FormInputArea>
+                                                <FormInputLabel><FaPhoneAlt />Telefone</FormInputLabel>
+                                                <MaskedInputComponent
+                                                    name='phone'
+                                                    type='text'
+                                                    mask={['(', /[0-9]/, /[0-9]/, ')', /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/, '-', /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/]}
+                                                    value={values.phone}
+                                                    placeholder='Telefone do Cliente'
+                                                    autoComplete='tel'
+                                                />
+                                            </FormInputArea>
+                                        </SubItensContainer>
                                         <ButtonGroup>
-                                            <BackButton type="button" onClick={
-                                                () => {
-                                                    closeAddModal();
-                                                }
-                                            }>
-                                                Cancelar</BackButton>
+                                            <BackButton type="button" onClick={closeAddModal}>
+                                                Cancelar
+                                            </BackButton>
                                             {
                                                 !isSubmitting && (
                                                     <SubmitButton type="submit">Cadastrar</SubmitButton>
@@ -184,7 +203,6 @@ const Clientes: React.FC<PageProps> = ({ navigate, user }) => {
                                                     <ThreeDots color={colors.icon} />
                                                 )
                                             }
-
                                         </ButtonGroup>
                                     </FormContent>
                                 </Form>

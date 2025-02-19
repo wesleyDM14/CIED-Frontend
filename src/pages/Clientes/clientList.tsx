@@ -21,12 +21,14 @@ import {
     FormInputLabel,
     FormInputLabelRequired,
     IconWrapper,
+    Limitador,
     SingleClient,
     StyledFormArea,
+    SubItensContainer,
     SubmitButton,
 } from "./styles";
 import Pagination from "../../components/Pagination";
-import { FaEdit, FaFileInvoice, FaMapPin, FaPhoneAlt, FaTrashAlt, FaUser, FaWhatsapp } from "react-icons/fa";
+import { FaEdit, FaFileInvoice, FaMapMarkedAlt, FaMapPin, FaPhoneAlt, FaTrashAlt, FaUser, FaWhatsapp } from "react-icons/fa";
 import { colors, ModalStyles } from "../../utils/GlobalStyles";
 import Modal from 'react-modal';
 import { Form, Formik } from "formik";
@@ -35,6 +37,7 @@ import { MdAlternateEmail, MdDriveFileRenameOutline } from "react-icons/md";
 import { ImWarning } from 'react-icons/im';
 import { FormInput, MaskedInputComponent } from "../../components/FormLib";
 import { ThreeDots } from "react-loader-spinner";
+import { deleteClient, updateClient } from "../../services/clientService";
 
 interface ClientListProps {
     clients: Cliente[];
@@ -48,10 +51,19 @@ interface ClientListProps {
 }
 
 const ClientList: React.FC<ClientListProps> = ({ clients, navigate, search, page, setPage, itensPerPage, setLoading, user }) => {
+
+    const rootElement = document.getElementById('root');
+    
+    if (rootElement) {
+        Modal.setAppElement(rootElement);
+    }
+
     const [selectedClient, setSelectedClient] = useState<Cliente>({});
 
     const [modalEditIsOpen, setModalEditIsOpen] = useState<boolean>(false);
     const [modalDeleteIsOpen, setModalDeleteIsOpen] = useState<boolean>(false);
+
+    const [deleting, setDeleting] = useState(false);
 
     const openEditModal = () => setModalEditIsOpen(true);
 
@@ -72,7 +84,8 @@ const ClientList: React.FC<ClientListProps> = ({ clients, navigate, search, page
             clients.filter((client) =>
                 client.name?.toLowerCase().includes(search.toLowerCase()) ||
                 client.phone?.toLowerCase().includes(search.toLowerCase()) ||
-                client.email?.toLowerCase().includes(search.toLowerCase())
+                client.email?.toLowerCase().includes(search.toLowerCase()) ||
+                client.address?.toLowerCase().includes(search.toLowerCase())
             ),
         [clients, search]
     );
@@ -107,7 +120,7 @@ const ClientList: React.FC<ClientListProps> = ({ clients, navigate, search, page
                         </ClientValueContainer>
                         <ClientValueContainer className="label-responsive">
                             <ClientLabel className="label-responsive"><FaMapPin /></ClientLabel>
-                            <ClientValue className="label-responsive">{''}</ClientValue>
+                            <ClientValue className="label-responsive">{cliente.address ? cliente.address : ''}</ClientValue>
                         </ClientValueContainer>
                         <AdminContainer>
                             <EditIconContainer onClick={(event) => {
@@ -144,16 +157,18 @@ const ClientList: React.FC<ClientListProps> = ({ clients, navigate, search, page
                             name: selectedClient.name,
                             email: selectedClient.email,
                             phone: selectedClient.phone,
+                            address: selectedClient.address
                         }}
                         validationSchema={
                             Yup.object({
                                 name: Yup.string().required('Nome é obrigatório'),
                                 email: Yup.string().email('Digite um email válido'),
                                 phone: Yup.string().matches(/^\d{11}$/, 'Telefone inválido'),
+                                address: Yup.string(),
                             })
                         }
-                        onSubmit={(values/*, { setSubmitting, setFieldError }*/) => {
-                            console.log(values);
+                        onSubmit={(values, { setSubmitting, setFieldError }) => {
+                            updateClient(values, user, setLoading, setFieldError, setSubmitting, closeEditModal);
                         }}
                     >
                         {
@@ -178,27 +193,37 @@ const ClientList: React.FC<ClientListProps> = ({ clients, navigate, search, page
                                                 autoComplete='email'
                                             />
                                         </FormInputArea>
-                                        <FormInputArea>
-                                            <FormInputLabel><FaPhoneAlt /> Telefone</FormInputLabel>
-                                            <MaskedInputComponent
-                                                name='phone'
-                                                type='text'
-                                                mask={['(', /[0-9]/, /[0-9]/, ')', /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/, '-', /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/]}
-                                                value={values.phone}
-                                                placeholder='Telefone do Cliente'
-                                                autoComplete='tel'
-                                            />
-                                        </FormInputArea>
+                                        <SubItensContainer>
+                                            <Limitador>
+                                                <FormInputArea>
+                                                    <FormInputLabel><FaMapMarkedAlt />Cidade</FormInputLabel>
+                                                    <FormInput
+                                                        type='text'
+                                                        name='address'
+                                                        placeholder='Cidade do Cliente'
+                                                        autoComplete='address'
+                                                    />
+                                                </FormInputArea>
+                                            </Limitador>
+                                            <FormInputArea>
+                                                <FormInputLabel><FaPhoneAlt />Telefone</FormInputLabel>
+                                                <MaskedInputComponent
+                                                    name='phone'
+                                                    type='text'
+                                                    mask={['(', /[0-9]/, /[0-9]/, ')', /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/, '-', /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/]}
+                                                    value={values.phone}
+                                                    placeholder='Telefone do Cliente'
+                                                    autoComplete='tel'
+                                                />
+                                            </FormInputArea>
+                                        </SubItensContainer>
                                         <ButtonGroup>
-                                            <BackButton type="button" onClick={
-                                                () => {
-                                                    closeEditModal();
-                                                }
-                                            }>
-                                                Cancelar</BackButton>
+                                            <BackButton type="button" onClick={closeEditModal}>
+                                                Cancelar
+                                            </BackButton>
                                             {
                                                 !isSubmitting && (
-                                                    <SubmitButton type="submit">Cadastrar</SubmitButton>
+                                                    <SubmitButton type="submit" className={isSubmitting ? "hidden" : ""}>Atualizar</SubmitButton>
                                                 )
                                             }
                                             {
@@ -206,7 +231,6 @@ const ClientList: React.FC<ClientListProps> = ({ clients, navigate, search, page
                                                     <ThreeDots color={colors.icon} />
                                                 )
                                             }
-
                                         </ButtonGroup>
                                     </FormContent>
                                 </Form>
@@ -231,11 +255,20 @@ const ClientList: React.FC<ClientListProps> = ({ clients, navigate, search, page
                         }}>
                             Cancelar
                         </BackButton>
-                        <SubmitButton onClick={() => {
-
-                        }}>
-                            Excluir
-                        </SubmitButton>
+                        {
+                            deleting && (
+                                <ThreeDots color={colors.icon} />
+                            )
+                        }
+                        {
+                            !deleting && (
+                                <SubmitButton onClick={() => {
+                                    deleteClient(selectedClient.id!, user, setDeleting, setLoading, closeDeleteModal);
+                                }}>
+                                    Excluir
+                                </SubmitButton>
+                            )
+                        }
                     </DeleteButtonContainer>
                 </DeleteContainer>
             </Modal>

@@ -98,13 +98,13 @@ export const IconWrapper = styled.div`
     margin-bottom: 15px;
 
     svg {
-        font-size: 150px;
+        font-size: 80px;
         color: ${colors.icon};
     }
 
     @media only screen and (max-width: 978px){
         svg {
-            font-size: 80px;  
+            font-size: 50px;  
         }
     }
 `;
@@ -269,7 +269,9 @@ export const ButtonGroup = styled.div`
     display: flex;
     flex-direction: row;
     justify-content: center;
+    align-items: center;
     padding: 0px 35px;
+    min-height: 40px;
 
     @media only screen and (max-width: 978px){
         flex-direction: column;
@@ -287,13 +289,16 @@ export const SubmitButton = styled.button`
     transition: all .2s ease-out;
     background-color: ${colors.btnSecondary};
     color: ${colors.white};
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-    &:hover{
+    &:hover {
         background-color: ${colors.hover};
         color: ${colors.mainText};
     }
 
-    @media only screen and (max-width: 978px){
+    @media only screen and (max-width: 978px) {
         min-width: 80%;
     }
 `;
@@ -420,12 +425,16 @@ export const DeleteTitle = styled.h5`
 export const DeleteButtonContainer = styled.div`
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
     margin-top: 25px;
     width: 100%;
+    min-height: 40px;
 
     @media only screen and (max-width: 978px){
         flex-direction: column;
+        gap: 10px;
     }
 `;
 

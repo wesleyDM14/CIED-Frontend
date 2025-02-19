@@ -9,12 +9,14 @@ import MainLayout from "../layouts/MainLayout";
 import NotAuthorized from "../pages/NotAuthorized";
 import NotFound from "../pages/NotFound";
 import Clientes from "../pages/Clientes";
+import Users from "../pages/Users";
 
 const AppRoutes = () => (
     <Routes>
         <Route path="/" element={<BasicRoute><Home /></BasicRoute>} />
         <Route path="/dashboard" element={<AuthRoute><MainLayout><Dashboard /></MainLayout></AuthRoute>} />
         <Route path="/clientes" element={<AuthRoute><MainLayout><Clientes /></MainLayout></AuthRoute>} />
+        <Route path="/usuarios" element={<AuthRoute><MainLayout><Users /></MainLayout></AuthRoute>} />
         <Route path='/not-authorized' element={<NotAuthorized />} />
         <Route path="*" element={<NotFound />} />
     </Routes>
