@@ -17,9 +17,36 @@ export interface PageProps {
 }
 
 export interface Cliente {
-    id?: string;
-    name?: string;
+    id?: string;          // Obrigatório apenas na resposta
+    name: string;
     email?: string;
     phone?: string;
-    address?: string;
+    cpf: string;
+    rg?: string;
+    dataNascimento?: Date | null;
+    logradouro?: string;
+    bairro?: string;
+    cidade?: string;
+    uf?: string;
+    num?: number | null;
+    createdAt?: Date;    // Deve ser opcional para criação
+    updatedAt?: Date;
+}
+
+export interface Ticket {
+    id?: string;
+    number?: string;
+    type?: "NORMAL" | "PREFERENCIAL";
+    status?: "WAITING" | "CALLED" | "FINISHED";
+    serviceCounter?: string;
+    room?: string;
+}
+
+export interface Procedimento {
+    id?: string;
+    nome?: string;
+    description?: string;
+    preco?: number;
+    metodoPagamento?: "DINHEIRO" | "PIX" | "CARTAO" | "CONVENIO" | "SUS";
+    ticketNumber?: string;
 }

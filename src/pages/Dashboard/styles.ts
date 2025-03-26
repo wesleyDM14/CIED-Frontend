@@ -7,12 +7,49 @@ export const DashboardContainer = styled.div`
     min-height: 100vh;
 `;
 
+export const Header = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 35px;
+
+    @media only screen and (max-width: 978px){
+        padding: 0;
+    }
+`
+
+export const Title = styled.h1`
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    color: ${colors.title};
+    font-weight: 700;
+
+    svg {
+        margin-right: 5px;
+    }
+
+    @media only screen and (max-width: 978px){
+        font-size: 18px;
+    }
+`;
+
+export const SummaryWrapper = styled.div`
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin: 1rem 0;
+    justify-content: center;
+    flex-wrap: wrap;
+`;
+
 export const SummaryCard = styled.div`
     background-color: ${colors.white};
     border: 1px solid ${colors.slimGray};
     border-radius: 8px;
     padding: 1rem;
     margin-bottom: 1rem;
+    margin-top: 1rem;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     transition: transform 0.3s;
     

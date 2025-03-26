@@ -6,3 +6,5 @@ export const selectUser = createSelector(
     (state: RootState) => state.session.userRole,
     (accessToken, userRole) => ({ accessToken, userRole })
 );
+
+export const selectServiceCounter = (state: RootState) => state.session.serviceCounter;

@@ -73,7 +73,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, closeSidebar, logoutUser
                             {visibleItems.map((item) => (
                                 <MenuItemContainer key={item.path} onClick={() => navigate(item.path)}>
                                     {item.icon}
-                                    <MenuItemTilte>{item.title}</MenuItemTilte>
+                                    <MenuItemTilte to={item.path}>{item.title}</MenuItemTilte>
                                 </MenuItemContainer>
                             ))}
                         </React.Fragment>

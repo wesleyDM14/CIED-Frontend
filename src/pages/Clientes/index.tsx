@@ -24,7 +24,7 @@ import {
     TextContent,
 } from "./styles";
 import Loading from "../../components/Loading";
-import { FaFileInvoice, FaMapMarkedAlt, FaPhoneAlt, FaPlus, FaPlusCircle, FaUsers } from "react-icons/fa";
+import { FaCalendar, FaFileInvoice, FaHashtag, FaIdCard, FaMapMarkedAlt, FaPhoneAlt, FaPlus, FaPlusCircle, FaUsers } from "react-icons/fa";
 import { MdAlternateEmail, MdDriveFileRenameOutline } from "react-icons/md";
 import { Cliente, PageProps } from "../../contexts/interfaces";
 import SearchBar from "../../components/SearchBar";
@@ -129,85 +129,170 @@ const Clientes: React.FC<PageProps> = ({ navigate, user }) => {
                             name: '',
                             email: '',
                             phone: '',
-                            address: '',
+                            cpf: '',
+                            rg: '',
+                            dataNascimento: undefined,
+                            logradouro: '',
+                            bairro: '',
+                            cidade: '',
+                            uf: '',
+                            num: undefined,
                         }}
                         validationSchema={
                             Yup.object({
                                 name: Yup.string().required('Nome é obrigatório'),
+                                cpf: Yup.string()
+                                    .required('CPF é obrigatório'),
+                                rg: Yup.string()
+                                    .nullable(),
                                 email: Yup.string().email('Digite um email válido'),
-                                phone: Yup.string().matches(/^\d{11}$/, 'Telefone inválido'),
-                                address: Yup.string(),
+                                phone: Yup.string()
+                                    .required('Telefone é obrigatório'),
+                                dataNascimento: Yup.date()
+                                    .max(new Date(), 'Data não pode ser futura')
+                                    .nullable(),
+                                num: Yup.number()
+                                    .positive('Número inválido')
+                                    .integer('Número inválido')
+                                    .nullable(),
                             })
                         }
                         onSubmit={(values, { setSubmitting, setFieldError }) => {
-                            createClient(values, user!, setLoading, setFieldError, setSubmitting, closeAddModal);
+                            createClient({
+                                ...values,
+                                dataNascimento: values.dataNascimento ? new Date(values.dataNascimento) : null,
+                            }, user!, setLoading, setFieldError, setSubmitting, closeAddModal);
                         }}
                     >
-                        {
-                            ({ isSubmitting, values }) => (
-                                <Form>
-                                    <FormContent>
-                                        <FormInputArea>
-                                            <FormInputLabelRequired><MdDriveFileRenameOutline />Nome</FormInputLabelRequired>
-                                            <FormInput
-                                                type='text'
-                                                name='name'
-                                                placeholder='Nome do Cliente'
-                                                autoComplete='name'
-                                            />
-                                        </FormInputArea>
-                                        <FormInputArea>
-                                            <FormInputLabel><MdAlternateEmail />Email</FormInputLabel>
-                                            <FormInput
-                                                type='text'
-                                                name='email'
-                                                placeholder='Email do Cliente'
-                                                autoComplete='email'
-                                            />
-                                        </FormInputArea>
-                                        <SubItensContainer>
-                                            <Limitador>
-                                                <FormInputArea>
-                                                    <FormInputLabel><FaMapMarkedAlt />Cidade</FormInputLabel>
-                                                    <FormInput
-                                                        type='text'
-                                                        name='address'
-                                                        placeholder='Cidade do Cliente'
-                                                        autoComplete='address'
-                                                    />
-                                                </FormInputArea>
-                                            </Limitador>
+                        {({ isSubmitting }) => (
+                            <Form>
+                                <FormContent>
+                                    <FormInputArea>
+                                        <FormInputLabelRequired><MdDriveFileRenameOutline />Nome</FormInputLabelRequired>
+                                        <FormInput
+                                            type='text'
+                                            name='name'
+                                            placeholder='Nome completo'
+                                        />
+                                    </FormInputArea>
+                                    <SubItensContainer>
+                                        <Limitador>
                                             <FormInputArea>
-                                                <FormInputLabel><FaPhoneAlt />Telefone</FormInputLabel>
+                                                <FormInputLabelRequired><FaIdCard />CPF</FormInputLabelRequired>
                                                 <MaskedInputComponent
-                                                    name='phone'
-                                                    type='text'
-                                                    mask={['(', /[0-9]/, /[0-9]/, ')', /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/, '-', /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/]}
-                                                    value={values.phone}
-                                                    placeholder='Telefone do Cliente'
-                                                    autoComplete='tel'
+                                                    name='cpf'
+                                                    mask={[/\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '-', /\d/, /\d/]}
+                                                    placeholder='000.000.000-00'
                                                 />
                                             </FormInputArea>
-                                        </SubItensContainer>
-                                        <ButtonGroup>
-                                            <BackButton type="button" onClick={closeAddModal}>
-                                                Cancelar
-                                            </BackButton>
-                                            {
-                                                !isSubmitting && (
-                                                    <SubmitButton type="submit">Cadastrar</SubmitButton>
-                                                )
-                                            }
-                                            {
-                                                isSubmitting && (
-                                                    <ThreeDots color={colors.icon} />
-                                                )
-                                            }
-                                        </ButtonGroup>
-                                    </FormContent>
-                                </Form>
-                            )
-                        }
+                                        </Limitador>
+                                        <FormInputArea>
+                                            <FormInputLabel><FaIdCard />RG</FormInputLabel>
+                                            <MaskedInputComponent
+                                                name='rg'
+                                                mask={[/\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '-', /\d/]}
+                                                placeholder='00.000.000-0'
+                                            />
+                                        </FormInputArea>
+                                    </SubItensContainer>
+                                    <SubItensContainer>
+                                        <Limitador>
+                                            <FormInputArea>
+                                                <FormInputLabel><FaCalendar />Nascimento</FormInputLabel>
+                                                <FormInput
+                                                    type='date'
+                                                    name='dataNascimento'
+                                                    max={new Date().toISOString().split('T')[0]}
+                                                />
+                                            </FormInputArea>
+                                        </Limitador>
+                                        <FormInputArea>
+                                            <FormInputLabelRequired><FaPhoneAlt />Telefone</FormInputLabelRequired>
+                                            <MaskedInputComponent
+                                                name='phone'
+                                                mask={['(', /[1-9]/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                                placeholder='(99) 99999-9999'
+                                            />
+                                        </FormInputArea>
+                                    </SubItensContainer>
+                                    <FormInputArea>
+                                        <FormInputLabel><MdAlternateEmail />Email</FormInputLabel>
+                                        <FormInput
+                                            type='email'
+                                            name='email'
+                                            placeholder='exemplo@email.com'
+                                        />
+                                    </FormInputArea>
+                                    <FormInputArea>
+                                        <FormInputLabel><FaMapMarkedAlt />Logradouro</FormInputLabel>
+                                        <FormInput
+                                            type='text'
+                                            name='logradouro'
+                                            placeholder='Rua/Avenida'
+                                        />
+                                    </FormInputArea>
+                                    <SubItensContainer>
+                                        <Limitador>
+                                            <FormInputArea>
+                                                <FormInputLabel><FaHashtag />Número</FormInputLabel>
+                                                <FormInput
+                                                    type='number'
+                                                    name='num'
+                                                    placeholder='Nº'
+                                                    min="0"
+                                                />
+                                            </FormInputArea>
+                                        </Limitador>
+                                        <FormInputArea>
+                                            <FormInputLabel><FaMapMarkedAlt />Bairro</FormInputLabel>
+                                            <FormInput
+                                                type='text'
+                                                name='bairro'
+                                                placeholder='Bairro'
+                                            />
+                                        </FormInputArea>
+                                    </SubItensContainer>
+                                    <SubItensContainer>
+                                        <Limitador>
+                                            <FormInputArea>
+                                                <FormInputLabel><FaMapMarkedAlt />UF</FormInputLabel>
+                                                <FormInput
+                                                    type='text'
+                                                    name='uf'
+                                                    placeholder='Estado'
+                                                    maxLength={2}
+                                                    style={{ textTransform: 'uppercase' }}
+                                                />
+                                            </FormInputArea>
+                                        </Limitador>
+                                        <FormInputArea>
+                                            <FormInputLabel><FaMapMarkedAlt />Cidade</FormInputLabel>
+                                            <FormInput
+                                                type='text'
+                                                name='cidade'
+                                                placeholder='Cidade'
+                                            />
+                                        </FormInputArea>
+                                    </SubItensContainer>
+
+                                    <ButtonGroup>
+                                        <BackButton type="button" onClick={closeAddModal}>
+                                            Cancelar
+                                        </BackButton>
+                                        {
+                                            !isSubmitting && (
+                                                <SubmitButton type="submit">Cadastrar</SubmitButton>
+                                            )
+                                        }
+                                        {
+                                            isSubmitting && (
+                                                <ThreeDots color={colors.icon} />
+                                            )
+                                        }
+                                    </ButtonGroup>
+                                </FormContent>
+                            </Form>
+                        )}
                     </Formik>
                 </StyledFormArea>
             </Modal>

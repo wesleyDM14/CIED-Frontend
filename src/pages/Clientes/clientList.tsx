@@ -28,7 +28,7 @@ import {
     SubmitButton,
 } from "./styles";
 import Pagination from "../../components/Pagination";
-import { FaEdit, FaFileInvoice, FaMapMarkedAlt, FaMapPin, FaPhoneAlt, FaTrashAlt, FaUser, FaWhatsapp } from "react-icons/fa";
+import { FaCalendar, FaEdit, FaFileInvoice, FaHashtag, FaIdCard, FaMapMarkedAlt, FaMapPin, FaPhoneAlt, FaTrashAlt, FaUser, FaWhatsapp } from "react-icons/fa";
 import { colors, ModalStyles } from "../../utils/GlobalStyles";
 import Modal from 'react-modal';
 import { Form, Formik } from "formik";
@@ -53,12 +53,12 @@ interface ClientListProps {
 const ClientList: React.FC<ClientListProps> = ({ clients, navigate, search, page, setPage, itensPerPage, setLoading, user }) => {
 
     const rootElement = document.getElementById('root');
-    
+
     if (rootElement) {
         Modal.setAppElement(rootElement);
     }
 
-    const [selectedClient, setSelectedClient] = useState<Cliente>({});
+    const [selectedClient, setSelectedClient] = useState<Cliente | null>(null);
 
     const [modalEditIsOpen, setModalEditIsOpen] = useState<boolean>(false);
     const [modalDeleteIsOpen, setModalDeleteIsOpen] = useState<boolean>(false);
@@ -69,14 +69,14 @@ const ClientList: React.FC<ClientListProps> = ({ clients, navigate, search, page
 
     const closeEditModal = () => {
         setModalEditIsOpen(false);
-        setSelectedClient({});
+        setSelectedClient(null);
     };
 
     const openDeleteModal = () => setModalDeleteIsOpen(true);
 
     const closeDeleteModal = () => {
         setModalDeleteIsOpen(false);
-        setSelectedClient({});
+        setSelectedClient(null);
     };
 
     const filteredClients = useMemo(
@@ -85,7 +85,7 @@ const ClientList: React.FC<ClientListProps> = ({ clients, navigate, search, page
                 client.name?.toLowerCase().includes(search.toLowerCase()) ||
                 client.phone?.toLowerCase().includes(search.toLowerCase()) ||
                 client.email?.toLowerCase().includes(search.toLowerCase()) ||
-                client.address?.toLowerCase().includes(search.toLowerCase())
+                `${client.logradouro} ${client.bairro} ${client.cidade} ${client.uf}`.toLowerCase().includes(search.toLowerCase())
             ),
         [clients, search]
     );
@@ -120,7 +120,7 @@ const ClientList: React.FC<ClientListProps> = ({ clients, navigate, search, page
                         </ClientValueContainer>
                         <ClientValueContainer className="label-responsive">
                             <ClientLabel className="label-responsive"><FaMapPin /></ClientLabel>
-                            <ClientValue className="label-responsive">{cliente.address ? cliente.address : ''}</ClientValue>
+                            <ClientValue className="label-responsive"> {cliente.cidade}{cliente.uf ? ` - ${cliente.uf}` : ''}</ClientValue>
                         </ClientValueContainer>
                         <AdminContainer>
                             <EditIconContainer onClick={(event) => {
@@ -153,26 +153,50 @@ const ClientList: React.FC<ClientListProps> = ({ clients, navigate, search, page
                     </div>
                     <Formik
                         initialValues={{
-                            id: selectedClient.id,
-                            name: selectedClient.name,
-                            email: selectedClient.email,
-                            phone: selectedClient.phone,
-                            address: selectedClient.address
+                            id: selectedClient?.id || '',
+                            name: selectedClient?.name || '',
+                            email: selectedClient?.email || '',
+                            phone: selectedClient?.phone || '',
+                            cpf: selectedClient?.cpf || '',
+                            logradouro: selectedClient?.logradouro || '',
+                            bairro: selectedClient?.bairro || '',
+                            cidade: selectedClient?.cidade || '',
+                            uf: selectedClient?.uf || '',
+                            num: selectedClient?.num || null,
                         }}
                         validationSchema={
                             Yup.object({
                                 name: Yup.string().required('Nome é obrigatório'),
+                                cpf: Yup.string()
+                                    .required('CPF é obrigatório'),
+                                rg: Yup.string()
+                                    .nullable(),
                                 email: Yup.string().email('Digite um email válido'),
-                                phone: Yup.string().matches(/^\d{11}$/, 'Telefone inválido'),
-                                address: Yup.string(),
+                                phone: Yup.string()
+                                    .required('Telefone é obrigatório'),
+                                dataNascimento: Yup.date()
+                                    .max(new Date(), 'Data não pode ser futura')
+                                    .nullable(),
+                                num: Yup.number()
+                                    .positive('Número inválido')
+                                    .integer('Número inválido')
+                                    .nullable(),
                             })
                         }
                         onSubmit={(values, { setSubmitting, setFieldError }) => {
-                            updateClient(values, user, setLoading, setFieldError, setSubmitting, closeEditModal);
+                            if (selectedClient) {
+                                const updateData = {
+                                    ...values,
+                                    id: selectedClient.id,
+                                    createdAt: selectedClient.createdAt,
+                                    updatedAt: new Date()
+                                };
+                                updateClient(updateData, user, setLoading, setFieldError, setSubmitting, closeEditModal);
+                            }
                         }}
                     >
                         {
-                            ({ isSubmitting, values }) => (
+                            ({ isSubmitting }) => (
                                 <Form>
                                     <FormContent>
                                         <FormInputArea>
@@ -180,40 +204,105 @@ const ClientList: React.FC<ClientListProps> = ({ clients, navigate, search, page
                                             <FormInput
                                                 type='text'
                                                 name='name'
-                                                placeholder='Nome do Cliente'
-                                                autoComplete='name'
-                                            />
-                                        </FormInputArea>
-                                        <FormInputArea>
-                                            <FormInputLabel><MdAlternateEmail />Email</FormInputLabel>
-                                            <FormInput
-                                                type='text'
-                                                name='email'
-                                                placeholder='Email do Cliente'
-                                                autoComplete='email'
+                                                placeholder='Nome completo'
                                             />
                                         </FormInputArea>
                                         <SubItensContainer>
                                             <Limitador>
                                                 <FormInputArea>
-                                                    <FormInputLabel><FaMapMarkedAlt />Cidade</FormInputLabel>
-                                                    <FormInput
-                                                        type='text'
-                                                        name='address'
-                                                        placeholder='Cidade do Cliente'
-                                                        autoComplete='address'
+                                                    <FormInputLabelRequired><FaIdCard />CPF</FormInputLabelRequired>
+                                                    <MaskedInputComponent
+                                                        name='cpf'
+                                                        mask={[/\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '-', /\d/, /\d/]}
+                                                        placeholder='000.000.000-00'
                                                     />
                                                 </FormInputArea>
                                             </Limitador>
                                             <FormInputArea>
-                                                <FormInputLabel><FaPhoneAlt />Telefone</FormInputLabel>
+                                                <FormInputLabel><FaIdCard />RG</FormInputLabel>
+                                                <MaskedInputComponent
+                                                    name='rg'
+                                                    mask={[/\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '-', /\d/]}
+                                                    placeholder='00.000.000-0'
+                                                />
+                                            </FormInputArea>
+                                        </SubItensContainer>
+                                        <SubItensContainer>
+                                            <Limitador>
+                                                <FormInputArea>
+                                                    <FormInputLabel><FaCalendar />Nascimento</FormInputLabel>
+                                                    <FormInput
+                                                        type='date'
+                                                        name='dataNascimento'
+                                                        max={new Date().toISOString().split('T')[0]}
+                                                    />
+                                                </FormInputArea>
+                                            </Limitador>
+                                            <FormInputArea>
+                                                <FormInputLabelRequired><FaPhoneAlt />Telefone</FormInputLabelRequired>
                                                 <MaskedInputComponent
                                                     name='phone'
+                                                    mask={['(', /[1-9]/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+                                                    placeholder='(99) 99999-9999'
+                                                />
+                                            </FormInputArea>
+                                        </SubItensContainer>
+                                        <FormInputArea>
+                                            <FormInputLabel><MdAlternateEmail />Email</FormInputLabel>
+                                            <FormInput
+                                                type='email'
+                                                name='email'
+                                                placeholder='exemplo@email.com'
+                                            />
+                                        </FormInputArea>
+                                        <FormInputArea>
+                                            <FormInputLabel><FaMapMarkedAlt />Logradouro</FormInputLabel>
+                                            <FormInput
+                                                type='text'
+                                                name='logradouro'
+                                                placeholder='Rua/Avenida'
+                                            />
+                                        </FormInputArea>
+                                        <SubItensContainer>
+                                            <Limitador>
+                                                <FormInputArea>
+                                                    <FormInputLabel><FaHashtag />Número</FormInputLabel>
+                                                    <FormInput
+                                                        type='number'
+                                                        name='num'
+                                                        placeholder='Nº'
+                                                        min="0"
+                                                    />
+                                                </FormInputArea>
+                                            </Limitador>
+                                            <FormInputArea>
+                                                <FormInputLabel><FaMapMarkedAlt />Bairro</FormInputLabel>
+                                                <FormInput
                                                     type='text'
-                                                    mask={['(', /[0-9]/, /[0-9]/, ')', /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/, '-', /[0-9]/, /[0-9]/, /[0-9]/, /[0-9]/]}
-                                                    value={values.phone}
-                                                    placeholder='Telefone do Cliente'
-                                                    autoComplete='tel'
+                                                    name='bairro'
+                                                    placeholder='Bairro'
+                                                />
+                                            </FormInputArea>
+                                        </SubItensContainer>
+                                        <SubItensContainer>
+                                            <Limitador>
+                                                <FormInputArea>
+                                                    <FormInputLabel><FaMapMarkedAlt />UF</FormInputLabel>
+                                                    <FormInput
+                                                        type='text'
+                                                        name='uf'
+                                                        placeholder='Estado'
+                                                        maxLength={2}
+                                                        style={{ textTransform: 'uppercase' }}
+                                                    />
+                                                </FormInputArea>
+                                            </Limitador>
+                                            <FormInputArea>
+                                                <FormInputLabel><FaMapMarkedAlt />Cidade</FormInputLabel>
+                                                <FormInput
+                                                    type='text'
+                                                    name='cidade'
+                                                    placeholder='Cidade'
                                                 />
                                             </FormInputArea>
                                         </SubItensContainer>
@@ -248,7 +337,7 @@ const ClientList: React.FC<ClientListProps> = ({ clients, navigate, search, page
                     <IconWrapper>
                         <ImWarning />
                     </IconWrapper>
-                    <DeleteTitle>Deseja excluir o Cliente {selectedClient.name}?</DeleteTitle>
+                    <DeleteTitle>Deseja excluir o Cliente {selectedClient?.name}?</DeleteTitle>
                     <DeleteButtonContainer>
                         <BackButton onClick={() => {
                             closeDeleteModal();
@@ -263,7 +352,9 @@ const ClientList: React.FC<ClientListProps> = ({ clients, navigate, search, page
                         {
                             !deleting && (
                                 <SubmitButton onClick={() => {
-                                    deleteClient(selectedClient.id!, user, setDeleting, setLoading, closeDeleteModal);
+                                    if (selectedClient?.id) {
+                                        deleteClient(selectedClient.id, user, setDeleting, setLoading, closeDeleteModal);
+                                    }
                                 }}>
                                     Excluir
                                 </SubmitButton>

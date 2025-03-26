@@ -38,6 +38,7 @@ export const GlobalStyle = createGlobalStyle`
     * {
         margin: 0;
         padding: 0;
+        transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     body {
@@ -51,6 +52,17 @@ export const GlobalStyle = createGlobalStyle`
 
     p, span, a, li {
         font-family: 'Open Sans', sans-serif;
+    }
+
+    button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
     }
 
     ::-webkit-scrollbar {

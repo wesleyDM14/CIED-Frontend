@@ -5,6 +5,7 @@ interface SessionState {
     accessToken: string | null;
     userRole: string | null;
     checked: boolean;
+    serviceCounter: string | null;
 }
 
 const initialState: SessionState = {
@@ -12,6 +13,7 @@ const initialState: SessionState = {
     accessToken: null,
     userRole: null,
     checked: false,
+    serviceCounter: localStorage.getItem('serviceCounter') ?? null,
 };
 
 const sessionSlice = createSlice({
@@ -24,11 +26,17 @@ const sessionSlice = createSlice({
             state.userRole = action.payload.userRole;
             state.checked = true;
         },
+        setServiceCounter: (state, action: PayloadAction<string>) => {
+            state.serviceCounter = action.payload;
+            localStorage.setItem('serviceCounter', action.payload);
+        },
         logout: (state) => {
             state.isAuthenticated = false;
             state.accessToken = null;
             state.userRole = null;
             state.checked = true;
+            state.serviceCounter = null;
+            localStorage.removeItem('serviceCounter');
             localStorage.removeItem('user');
         },
         setChecked: (state) => {
@@ -37,5 +45,5 @@ const sessionSlice = createSlice({
     },
 });
 
-export const { login, logout, setChecked } = sessionSlice.actions;
+export const { login, logout, setChecked, setServiceCounter } = sessionSlice.actions;
 export default sessionSlice.reducer;
