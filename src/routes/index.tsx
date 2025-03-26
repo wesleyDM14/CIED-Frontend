@@ -13,6 +13,7 @@ import Users from "../pages/Users";
 import Perfil from "../pages/Perfil";
 import Atendimento from "../pages/Atendimento";
 import Painel from "../pages/Painel";
+import Procedimentos from "../pages/Procedimentos";
 
 const AppRoutes = () => (
     <Routes>
@@ -23,6 +24,7 @@ const AppRoutes = () => (
         <Route path="/usuarios" element={<AuthRoute><MainLayout><Users /></MainLayout></AuthRoute>} />
         <Route path="/painel" element={<AuthRoute><Painel /></AuthRoute>} />
         <Route path='/perfil' element={<AuthRoute><MainLayout><Perfil /></MainLayout></AuthRoute>} />
+        <Route path='/procedimentos' element={<AuthRoute><MainLayout><Procedimentos /></MainLayout></AuthRoute>} />
         <Route path='/not-authorized' element={<NotAuthorized />} />
         <Route path="*" element={<NotFound />} />
     </Routes>

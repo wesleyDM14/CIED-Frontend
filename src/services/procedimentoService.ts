@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Procedimento, User } from '../contexts/interfaces';
 
-export const createProcedimento = async (procedimento: Procedimento, user: User, setFieldError: (field: string, message: string) => void, setSubmitting: (submitting: boolean) => void, closeModal: () => void) => {
+export const createProcedimento = async (procedimento: Procedimento, user: User, setFieldError: (field: string, message: string) => void, setSubmitting: (submitting: boolean) => void, closeModal: () => void, setLoading: (loading: boolean) => void) => {
     await axios.post(`${import.meta.env.VITE_BASE_URL}/api/procedimentos/create`, procedimento, {
         headers: {
             "Content-Type": "application/json",
@@ -12,9 +12,10 @@ export const createProcedimento = async (procedimento: Procedimento, user: User,
         console.log(data);
         window.alert('Procedimento cadastrado com sucesso!');
         closeModal();
+        setLoading(true);
     }).catch((err) => {
         console.error(err.response.data.error);
-        setFieldError('nome', err.response.data.error);
+        setFieldError('description', err.response.data.error);
     }).finally(() => {
         setSubmitting(false);
     });
@@ -54,7 +55,7 @@ export const getProcedimentosByClient = async (user: User, clientId: string, set
     });
 }
 
-export const updateProcedimento = async (procedimento: Procedimento, user: User, setFieldError: (field: string, message: string) => void, setSubmitting: (submitting: boolean) => void, closeModal: () => void) => {
+export const updateProcedimento = async (procedimento: Procedimento, user: User, setFieldError: (field: string, message: string) => void, setSubmitting: (submitting: boolean) => void, closeModal: () => void, setLoading: (loading: boolean) => void) => {
     await axios.put(`${import.meta.env.VITE_BASE_URL}/api/procedimentos/procedimento/${procedimento.id}`, procedimento, {
         headers: {
             "Content-Type": "application/json",
@@ -65,6 +66,7 @@ export const updateProcedimento = async (procedimento: Procedimento, user: User,
         console.log(data);
         window.alert('Procedimento atualizado com sucesso!');
         closeModal();
+        setLoading(true);
     }).catch((err) => {
         console.error(err.response.data.error);
         setFieldError('nome', err.response.data.error);

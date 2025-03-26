@@ -44,9 +44,6 @@ export interface Ticket {
 
 export interface Procedimento {
     id?: string;
-    nome?: string;
+    nomeProfissional?: string;
     description?: string;
-    preco?: number;
-    metodoPagamento?: "DINHEIRO" | "PIX" | "CARTAO" | "CONVENIO" | "SUS";
-    ticketNumber?: string;
 }

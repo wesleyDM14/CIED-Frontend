@@ -12,7 +12,7 @@ import {
     Title,
     TitleContainer,
 } from "./styles";
-import { FaPowerOff, FaTimes, FaUsers } from "react-icons/fa";
+import { FaClipboardList, FaPowerOff, FaTimes, FaUsers } from "react-icons/fa";
 import { RiCustomerServiceFill } from "react-icons/ri";
 import { TbUsersGroup } from "react-icons/tb";
 import { BiSolidUserRectangle } from 'react-icons/bi';
@@ -42,6 +42,7 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, closeSidebar, logoutUser
                 { path: '/clientes', title: 'Clientes', icon: <TbUsersGroup /> },
                 { path: '/usuarios', title: 'Usuários', icon: <FaUsers /> },
                 { path: '/painel', title: 'Painel de Atendimento', icon: <LuLayoutDashboard /> },
+                { path: '/procedimentos', title: 'Procedimentos', icon: <FaClipboardList /> }
             ],
         },
         {
