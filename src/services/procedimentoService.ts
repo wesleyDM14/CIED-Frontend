@@ -21,7 +21,7 @@ export const createProcedimento = async (procedimento: Procedimento, user: User,
     });
 }
 
-export const getProcedimentos = async (user: User, setProcedimentos: (procedimentos: Procedimento[]) => void, setLoading: (loading: boolean) => void) => {
+export const getProcedimentos = async (user: User, setProcedimentos: (procedimentos: Procedimento[]) => void) => {
     await axios.get(`${import.meta.env.VITE_BASE_URL}/api/procedimentos/procedimentos`, {
         headers: {
             "Content-Type": "application/json",
@@ -33,8 +33,6 @@ export const getProcedimentos = async (user: User, setProcedimentos: (procedimen
     }).catch((err) => {
         console.error(err.response.data.error);
         window.alert(err.response.data.error);
-    }).finally(() => {
-        setLoading(false);
     });
 }
 

@@ -14,11 +14,13 @@ import Perfil from "../pages/Perfil";
 import Atendimento from "../pages/Atendimento";
 import Painel from "../pages/Painel";
 import Procedimentos from "../pages/Procedimentos";
+import Agenda from "../pages/Agenda";
 
 const AppRoutes = () => (
     <Routes>
         <Route path="/" element={<BasicRoute><Home /></BasicRoute>} />
         <Route path="/dashboard" element={<AuthRoute><MainLayout><Dashboard /></MainLayout></AuthRoute>} />
+        <Route path="/agenda" element={<AuthRoute><MainLayout><Agenda /></MainLayout></AuthRoute>} />
         <Route path="/atendimento" element={<AuthRoute><MainLayout><Atendimento /></MainLayout></AuthRoute>} />
         <Route path="/clientes" element={<AuthRoute><MainLayout><Clientes /></MainLayout></AuthRoute>} />
         <Route path="/usuarios" element={<AuthRoute><MainLayout><Users /></MainLayout></AuthRoute>} />

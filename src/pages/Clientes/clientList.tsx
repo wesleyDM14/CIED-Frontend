@@ -105,7 +105,7 @@ const ClientList: React.FC<ClientListProps> = ({ clients, navigate, search, page
                 currentPageItens.map((cliente) => (
                     <SingleClient key={cliente.id} onClick={() => navigate(`/`)}>
                         <ClientValueContainer>
-                            <ClientLabel><FaUser style={{ marginLeft: '5px' }} /></ClientLabel>
+                            <ClientLabel className=".label-responsive"><FaUser style={{ marginLeft: '5px' }} /></ClientLabel>
                             <ClientValue>{cliente.name}</ClientValue>
                         </ClientValueContainer>
                         <ClientValueContainer>

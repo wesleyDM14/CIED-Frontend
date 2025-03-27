@@ -170,7 +170,7 @@ export const ProcedimentoListContainer = styled.div`
 
 export const ProcedimentoListHeader = styled.div`
     display: grid;
-    grid-template-columns: 3fr 1fr 1fr 0.5fr;
+    grid-template-columns: 1fr 1fr 0.5fr;
     max-width: 100%;
     margin-top: 15px;
     padding: 10px;
@@ -181,7 +181,7 @@ export const ProcedimentoListHeader = styled.div`
 
     @media only screen and (max-width: 978px){
         font-size: 80%;
-        grid-template-columns: 2fr 1fr 0.5fr;
+        grid-template-columns: 1fr 1fr 0.5fr;
         padding: 5px 1px;
     }
 `;
@@ -329,7 +329,7 @@ export const BackButton = styled.button`
 
 export const SingleProcedimento = styled.div`
     display: grid;
-    grid-template-columns: 3fr 1fr 1fr 0.5fr;
+    grid-template-columns: 1fr 1fr 0.5fr;
     height: 50px;
     max-width: 100%;
     align-items: center;
@@ -339,7 +339,7 @@ export const SingleProcedimento = styled.div`
     overflow: hidden;
 
     @media only screen and (max-width: 978px){
-        grid-template-columns: 2fr 1fr 0.5fr;
+        grid-template-columns: 1fr 1fr 0.5fr;
     }
 `;
 

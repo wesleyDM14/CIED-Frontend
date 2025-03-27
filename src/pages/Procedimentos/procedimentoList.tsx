@@ -97,13 +97,13 @@ const ProcedimentoList: React.FC<ProcedimentoListProps> = ({ procedimentos, navi
             </ProcedimentoListHeader>
             {
                 currentPageItens.map((procedimento) => (
-                    <SingleProcedimento onClick={() => navigate('/')}>
+                    <SingleProcedimento key={procedimento.id} onClick={() => navigate('/')}>
                         <ProcedimentoValueContainer>
-                            <ProcedimentoLabel><FaClipboardList />Procedimento</ProcedimentoLabel>
+                            <ProcedimentoLabel className="label-responsive"><FaClipboardList />Procedimento:</ProcedimentoLabel>
                             <ProcedimentoValue>{procedimento.description}</ProcedimentoValue>
                         </ProcedimentoValueContainer>
                         <ProcedimentoValueContainer>
-                            <ProcedimentoLabel><FaUser />Profissional</ProcedimentoLabel>
+                            <ProcedimentoLabel className="label-responsive"><FaUser />Profissional:</ProcedimentoLabel>
                             <ProcedimentoValue>{procedimento.nomeProfissional}</ProcedimentoValue>
                         </ProcedimentoValueContainer>
                         <AdminContainer>

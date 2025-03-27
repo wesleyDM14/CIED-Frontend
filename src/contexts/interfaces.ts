@@ -47,3 +47,14 @@ export interface Procedimento {
     nomeProfissional?: string;
     description?: string;
 }
+
+export interface ScheduleProcedimento {
+    id: string;
+    procedimento: Procedimento;
+}
+
+export interface Schedule {
+    id: string;
+    date: Date;
+    procedimentos: ScheduleProcedimento[];
+}

@@ -59,7 +59,13 @@ const Procedimentos: React.FC<PageProps> = ({ navigate, user }) => {
 
     useEffect(() => {
         if (loading) {
-            getProcedimentos(user!, setProcedimentos, setLoading);
+            try {
+                getProcedimentos(user!, setProcedimentos);
+            } catch (err) {
+                console.log(err);
+            } finally {
+                setLoading(false);
+            }
         }
     }, [user, loading]);
 

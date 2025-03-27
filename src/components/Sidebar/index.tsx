@@ -12,7 +12,7 @@ import {
     Title,
     TitleContainer,
 } from "./styles";
-import { FaClipboardList, FaPowerOff, FaTimes, FaUsers } from "react-icons/fa";
+import { FaCalendarAlt, FaClipboardList, FaPowerOff, FaTimes, FaUsers } from "react-icons/fa";
 import { RiCustomerServiceFill } from "react-icons/ri";
 import { TbUsersGroup } from "react-icons/tb";
 import { BiSolidUserRectangle } from 'react-icons/bi';
@@ -42,7 +42,8 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, closeSidebar, logoutUser
                 { path: '/clientes', title: 'Clientes', icon: <TbUsersGroup /> },
                 { path: '/usuarios', title: 'Usuários', icon: <FaUsers /> },
                 { path: '/painel', title: 'Painel de Atendimento', icon: <LuLayoutDashboard /> },
-                { path: '/procedimentos', title: 'Procedimentos', icon: <FaClipboardList /> }
+                { path: '/procedimentos', title: 'Procedimentos', icon: <FaClipboardList /> },
+                { path: '/agenda', title: 'Agenda', icon: <FaCalendarAlt /> }
             ],
         },
         {
@@ -52,6 +53,12 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, closeSidebar, logoutUser
             ],
         },
     ];
+
+    menuSections.forEach(section => {
+        section.items.sort((a, b) => a.title.localeCompare(b.title));
+    });
+
+    menuSections.sort((a, b) => a.title.localeCompare(b.title));
 
     return (
         <div className={sidebarOpen ? 'sidebar-responsive' : ''} id="sidebar">

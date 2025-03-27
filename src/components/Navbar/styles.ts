@@ -1,11 +1,10 @@
 import styled from "styled-components";
-import { Link } from "react-router-dom";
 import { colors } from "../../utils/GlobalStyles";
 
 interface NavbarAvatarProps {
     $image: string;
-  }
-  
+}
+
 export const NavbarContainer = styled.nav`
     background: ${colors.navbar};
     grid-area: nav;
@@ -43,11 +42,12 @@ export const NavbarItemContainer = styled.div`
     position: relative;
 `;
 
-export const NavbarItemLabel = styled(Link)`
+export const NavbarItemLabel = styled.p`
     color: ${colors.white};
     font-family: 'Montserrat', sans-serif;
     margin-left: 5px;
     text-decoration: none;
+    cursor: pointer;
 `;
 
 export const NavbarShowIcon = styled.div`
