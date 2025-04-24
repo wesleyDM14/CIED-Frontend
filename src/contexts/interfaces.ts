@@ -58,3 +58,7 @@ export interface Schedule {
     date: Date;
     procedimentos: ScheduleProcedimento[];
 }
+
+export interface ProcedimentoToSave {
+    procedimentoId: string;
+}

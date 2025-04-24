@@ -224,11 +224,11 @@ export const ScheduleList = styled.div`
 `;
 
 interface ScheduleBadgeProps {
-  index: number;
+  $index: number;
 }
 
 export const ScheduleBadge = styled.div<ScheduleBadgeProps>`
-  background: ${({ index }) => index % 2 === 0 ? colors.primary : colors.secondary};
+  background: ${({ $index }) => $index % 2 === 0 ? colors.primary : colors.secondary};
   color: ${colors.white};
   padding: ${spacing.xsmall} ${spacing.small};
   border-radius: 8px;
@@ -284,18 +284,125 @@ export const ModalOverlay = styled.div`
 `;
 
 export const ModalContent = styled.div`
-  background: ${colors.white};
-  width: 90%;
-  max-width: 640px;
-  border-radius: 24px;
-  padding: ${spacing.large};
-  animation: ${fadeInAnimation} 0.3s ease-in;
-  max-height: 80vh;
-  overflow-y: auto;
+  max-width: 800px;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  position: relative;
 
-  @media (max-width: ${breakpoints.mobile}) {
-    padding: ${spacing.medium};
-    border-radius: 16px;
+  .edit-mode-controls {
+    margin: 1rem 0;
+    display: flex;
+    justify-content: flex-end;
+
+    .toggle-button {
+      background: #2196F3;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.9rem;
+
+      &:hover {
+        background: #1976D2;
+        transform: translateY(-1px);
+      }
+    }
+  }
+
+  .existing-procedures {
+    margin: 1rem 0;
+    max-height: 400px;
+    overflow-y: auto;
+
+    .empty-message {
+      color: #757575;
+      font-style: italic;
+      text-align: center;
+      padding: 1rem;
+    }
+  }
+
+  .remove-btn {
+    background: #ff4444;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+
+    &:hover {
+      background: #cc0000;
+    }
+  }
+
+  .procedure-info {
+    flex-grow: 1;
+    padding-right: 1rem;
+  }
+
+  .procedures-list {
+    max-height: 500px;
+    overflow-y: auto;
+    margin: 1rem 0;
+  }
+
+  .toggle-button {
+    background: #2196f3;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 14px;
+    margin: 15px 0;
+
+    &:hover {
+      background: #1976d2;
+      transform: translateY(-2px);
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    }
+  }
+
+  .procedure-info {
+    flex: 1;
+    padding-right: 15px;
+
+    h4 {
+      margin: 0 0 5px 0;
+      color: #2c3e50;
+      font-size: 16px;
+    }
+
+    p {
+      margin: 0;
+      color: #7f8c8d;
+      font-size: 14px;
+    }
+  }
+
+  .remove-btn {
+    background: #e74c3c;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+
+    &:hover {
+      background: #c0392b;
+    }
+  }
+
+  .existing-procedures {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    margin: 15px 0;
   }
 `;
 

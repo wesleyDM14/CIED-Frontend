@@ -27,9 +27,10 @@ import { ptBR } from 'date-fns/locale';
 import { motion } from 'framer-motion';
 import Modal from 'react-modal';
 import { getProcedimentos } from "../../services/procedimentoService";
-import { getAgendamentoMensal, /*registrarAgendaDiaria*/ } from "../../services/agendaService";
+import { getAgendamentoMensal, registraAgendaDiaria, removerProcedimentoAgenda } from "../../services/agendaService";
 import SearchBar from "../../components/SearchBar";
 import Pagination from "../../components/Pagination";
+import Loading from "../../components/Loading";
 
 const Agenda: React.FC<PageProps> = ({ user }) => {
     const rootElement = document.getElementById('root');
@@ -40,6 +41,9 @@ const Agenda: React.FC<PageProps> = ({ user }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
+    const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(null);
+    const [showAddProcedures, setShowAddProcedures] = useState(false);
 
     const [procedimentos, setProcedimentos] = useState<Procedimento[]>([]);
     const [agendamentoMensal, setAgendamentoMensal] = useState<Schedule[]>([]);
@@ -63,31 +67,63 @@ const Agenda: React.FC<PageProps> = ({ user }) => {
         end: endOfWeek(currentDate, { locale: ptBR })
     });
 
-    const openModal = () => {
+    const openModal = (mode: 'add' | 'edit') => {
+        setModalMode(mode);
         setModalIsOpen(true);
     }
 
     const closeModal = () => {
         setModalIsOpen(false);
         setSelectedProcedures([]);
-    }
+        setSelectedScheduleId(null);
+        setShowAddProcedures(false);
+    };
 
-    const handleDateSelect = (date: Date) => {
+    const handleEditDate = (date: Date) => {
+        const schedule = agendamentoMensal.find(a =>
+            format(a.date, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
+        );
         setSelectedDate(date);
-        openModal();
+        setSelectedScheduleId(schedule?.id || null);
+        setSelectedProcedures(schedule?.procedimentos.map(sp => sp.procedimento) || []);
+        openModal('edit');
+    };
+
+    const handleAddDate = (date: Date, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setSelectedDate(date);
+        setSelectedProcedures([]);
+        openModal('add');
     };
 
     const handleAddProcedure = (procedimento: Procedimento) => {
-        setSelectedProcedures(prevState => {
-            if (prevState.some(p => p.id === procedimento.id)) {
-                return prevState.filter(p => p.id !== procedimento.id); // Remove if already selected
+        setSelectedProcedures(prevState =>
+            prevState.some(p => p.id === procedimento.id)
+                ? prevState.filter(p => p.id !== procedimento.id)
+                : [...prevState, procedimento]
+        );
+    };
+
+    const handleRemoveProcedure = async (procedimento: Procedimento) => {
+        if (!selectedScheduleId || !procedimento.id) {
+            alert('Erro ao identificar o agendamento');
+            return;
+        }
+
+        if (window.confirm('Tem certeza que deseja remover este procedimento da agenda?')) {
+            try {
+                await removerProcedimentoAgenda(user!, selectedScheduleId, procedimento.id, setLoading);
+                setSelectedProcedures(prev => prev.filter(p => p.id !== procedimento.id));
+            } catch (error) {
+                console.error(error);
+                alert('Erro ao remover procedimento');
             }
-            return [...prevState, procedimento]; // Add if not selected
-        });
+        }
     };
 
     const filteredProcedures = procedimentos.filter(proc =>
-        proc.nomeProfissional?.toLowerCase().includes(search.toLowerCase())
+        proc.nomeProfissional?.toLowerCase().includes(search.toLowerCase()) ||
+        proc.description?.toLowerCase().includes(search.toLowerCase())
     );
 
     const totalPages = Math.ceil(filteredProcedures.length / proceduresPerPage);
@@ -97,23 +133,19 @@ const Agenda: React.FC<PageProps> = ({ user }) => {
     );
 
     const handleSaveAgenda = async () => {
-        if (selectedDate && selectedProcedures.length > 0) {
+        if (selectedDate) {
             try {
                 const procedimentosToSave = selectedProcedures.map((proc) => ({
-                    procedimentoId: proc.id,
+                    procedimentoId: proc.id!,
                 }));
 
-                console.log(procedimentosToSave);
-                /*await registrarAgendaDiaria(selectedDate, procedimentos);*/ // Chama a função para registrar
-                alert("Agenda registrada com sucesso!");
-                closeModal(); // Fechar o modal após salvar
-                setSelectedProcedures([]); // Resetar os procedimentos selecionados
+                await registraAgendaDiaria(user!, selectedDate, procedimentosToSave, closeModal, setLoading);
             } catch (error) {
                 console.error(error);
                 alert("Erro ao registrar a agenda.");
             }
         } else {
-            alert("Selecione uma data e ao menos um procedimento.");
+            alert("Selecione uma data.");
         }
     };
 
@@ -121,12 +153,12 @@ const Agenda: React.FC<PageProps> = ({ user }) => {
         const fetchData = async () => {
             if (loading) {
                 try {
-                    const ano = selectedDate ? selectedDate.getFullYear() : currentDate.getFullYear();
-                    const mes = selectedDate ? selectedDate.getMonth() + 1 : currentDate.getMonth() + 1;
+                    const ano = currentDate.getFullYear();
+                    const mes = currentDate.getMonth() + 1;
 
                     await Promise.all([
                         getProcedimentos(user!, setProcedimentos),
-                        getAgendamentoMensal(user!, ano, mes, setAgendamentoMensal)
+                        getAgendamentoMensal(user!, mes, ano, setAgendamentoMensal)
                     ]);
 
                 } catch (error) {
@@ -141,133 +173,220 @@ const Agenda: React.FC<PageProps> = ({ user }) => {
             fetchData();
         }
 
-    }, [loading, user, currentDate, selectedDate]);
+    }, [loading, user, currentDate]);
 
     return (
-        <GradientBackground>
-            <CalendarContainer>
-                <CalendarHeader>
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-                        <h1>
-                            <FaCalendarAlt className="header-icon" />
-                            {format(currentDate, 'MMMM yyyy', { locale: ptBR })}
-                        </h1>
-                    </motion.div>
+        <>
+            {loading ? (
+                <Loading />
+            ) : (
+                <GradientBackground>
+                    <CalendarContainer>
+                        <CalendarHeader>
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+                                <h1>
+                                    <FaCalendarAlt className="header-icon" />
+                                    {format(currentDate, 'MMMM yyyy', { locale: ptBR })}
+                                </h1>
+                            </motion.div>
 
-                    <div className="navigation">
-                        <NavigationButton onClick={() => setCurrentDate(addDays(currentDate, -30))}>
-                            <FaChevronLeft />
-                        </NavigationButton>
+                            <div className="navigation">
+                                <NavigationButton onClick={() => setCurrentDate(addDays(currentDate, -30))}>
+                                    <FaChevronLeft />
+                                </NavigationButton>
 
-                        <TodayButton onClick={() => setCurrentDate(new Date())}>
-                            Hoje
-                        </TodayButton>
+                                <TodayButton onClick={() => setCurrentDate(new Date())}>
+                                    Hoje
+                                </TodayButton>
 
-                        <NavigationButton onClick={() => setCurrentDate(addDays(currentDate, 30))}>
-                            <FaChevronRight />
-                        </NavigationButton>
-                    </div>
-                </CalendarHeader>
-
-                <WeekDaysHeader>
-                    {weekDays.map((day, index) => (
-                        <WeekDay key={index}>
-                            {format(day, 'EEE', { locale: ptBR }).replace('.', '')}
-                        </WeekDay>
-                    ))}
-                </WeekDaysHeader>
-
-                <CalendarGrid>
-                    {daysInGrid.map(day => {
-                        const isCurrentMonth = isSameMonth(day, currentDate);
-                        const schedule = agendamentoMensal.find(a =>
-                            format(a.date, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd')
-                        );
-
-                        return (
-                            <CalendarDay
-                                key={day.toString()}
-                                onClick={() => isCurrentMonth && handleDateSelect(day)}
-                                $hasSchedule={!!schedule}
-                                className={`${isCurrentMonth ? '' : 'other-month'} ${!isCurrentMonth ? 'non-clickable' : ''}`}
-                            >
-                                <DayNumber $currentMonth={isCurrentMonth}>
-                                    {format(day, 'd')}
-                                </DayNumber>
-
-                                {isCurrentMonth && schedule && (
-                                    <ScheduleList>
-                                        {schedule.procedimentos.map((sp, index) => (
-                                            <ScheduleBadge key={sp.id} index={index}>
-                                                <FaStethoscope />
-                                                <span>{sp.procedimento.nomeProfissional}</span>
-                                            </ScheduleBadge>
-                                        ))}
-                                    </ScheduleList>
-                                )}
-
-                                {isCurrentMonth && <AddButton><FaPlus /></AddButton>}
-                            </CalendarDay>
-                        );
-                    })}
-                </CalendarGrid>
-
-                <Modal
-                    isOpen={modalIsOpen}
-                    onRequestClose={closeModal}
-                    className="modal"
-                    overlayClassName="overlay"
-                    shouldCloseOnOverlayClick={true}
-                >
-                    <ModalOverlay onClick={closeModal}>
-                        <ModalContent onClick={(e) => e.stopPropagation()}>
-                            <ModalHeader>
-                                <h2>
-                                    {selectedDate && format(selectedDate, 'dd/MM/yyyy')}
-                                </h2>
-                                <button onClick={closeModal}>×</button>
-                            </ModalHeader>
-
-                            <SearchBar search={search} setSearch={setSearch} />
-
-                            <div className="procedures-list">
-                                <h3>Procedimentos Disponíveis</h3>
-                                {paginatedProcedures.map(proc => (
-                                    <ProcedureCard key={proc.id}>
-                                        <div className="procedure-info">
-                                            <h4>{proc.nomeProfissional}</h4>
-                                            <p>{proc.description}</p>
-                                        </div>
-                                        <button onClick={() => handleAddProcedure(proc)}>Adicionar</button>
-                                    </ProcedureCard>
-                                ))}
-                                {totalPages > 1 && (
-                                    <Pagination totalPages={totalPages} currentPage={currentPage} setPage={setCurrentPage} />
-                                )}
+                                <NavigationButton onClick={() => setCurrentDate(addDays(currentDate, 30))}>
+                                    <FaChevronRight />
+                                </NavigationButton>
                             </div>
+                        </CalendarHeader>
 
-                            <div>
-                                {selectedProcedures.length > 0 && (
-                                    <div>
-                                        <h4>Procedimentos Selecionados:</h4>
-                                        {selectedProcedures.map((proc) => (
-                                            <SelectedProcedure key={proc.id}>
-                                                <span>{proc.nomeProfissional}</span>
-                                                <button onClick={() => handleAddProcedure(proc)}>Remover</button>
-                                            </SelectedProcedure>
-                                        ))}
-                                    </div>
-                                )}
+                        <WeekDaysHeader>
+                            {weekDays.map((day, index) => (
+                                <WeekDay key={index}>
+                                    {format(day, 'EEE', { locale: ptBR }).replace('.', '')}
+                                </WeekDay>
+                            ))}
+                        </WeekDaysHeader>
 
-                                <SaveButton onClick={handleSaveAgenda} disabled={selectedProcedures.length === 0}>
-                                    Salvar Agenda
-                                </SaveButton>
-                            </div>
-                        </ModalContent>
-                    </ModalOverlay>
-                </Modal>
-            </CalendarContainer>
-        </GradientBackground>
+                        <CalendarGrid>
+                            {daysInGrid.map(day => {
+                                const isCurrentMonth = isSameMonth(day, currentDate);
+                                const schedule = agendamentoMensal.find(a =>
+                                    format(a.date, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd')
+                                );
+
+                                return (
+                                    <CalendarDay
+                                        key={day.toString()}
+                                        onClick={() => isCurrentMonth && handleEditDate(day)}
+                                        $hasSchedule={!!schedule}
+                                        className={`${isCurrentMonth ? '' : 'other-month'} ${!isCurrentMonth ? 'non-clickable' : ''}`}
+                                    >
+                                        <DayNumber $currentMonth={isCurrentMonth}>
+                                            {format(day, 'd')}
+                                        </DayNumber>
+
+                                        {isCurrentMonth && schedule && (
+                                            <ScheduleList>
+                                                {schedule.procedimentos.map((sp, index) => (
+                                                    <ScheduleBadge key={sp.id} $index={index}>
+                                                        <FaStethoscope />
+                                                        <span>{sp.procedimento.description}</span>
+                                                    </ScheduleBadge>
+                                                ))}
+                                            </ScheduleList>
+                                        )}
+
+                                        {isCurrentMonth && (
+                                            <AddButton onClick={(e) => handleAddDate(day, e)}>
+                                                <FaPlus />
+                                            </AddButton>
+                                        )}
+                                    </CalendarDay>
+                                );
+                            })}
+                        </CalendarGrid>
+
+                        <Modal
+                            isOpen={modalIsOpen}
+                            onRequestClose={closeModal}
+                            className="modal"
+                            overlayClassName="overlay"
+                            shouldCloseOnOverlayClick={true}
+                        >
+                            <ModalOverlay onClick={closeModal}>
+                                <ModalContent onClick={(e) => e.stopPropagation()}>
+                                    <ModalHeader>
+                                        <h2>
+                                            {selectedDate && format(selectedDate, 'dd/MM/yyyy')}
+                                        </h2>
+                                        <button onClick={closeModal}>×</button>
+                                    </ModalHeader>
+
+                                    {modalMode === 'add' ? (
+                                        <>
+                                            <SearchBar search={search} setSearch={setSearch} />
+                                            <div className="procedures-list">
+                                                <h3>Procedimentos Disponíveis</h3>
+                                                {paginatedProcedures.map(proc => (
+                                                    <ProcedureCard key={proc.id}>
+                                                        <div className="procedure-info">
+                                                            <h4>{proc.nomeProfissional}</h4>
+                                                            <p>{proc.description}</p>
+                                                        </div>
+                                                        <button onClick={() => handleAddProcedure(proc)}>
+                                                            {selectedProcedures.some(p => p.id === proc.id)
+                                                                ? 'Remover'
+                                                                : 'Adicionar'}
+                                                        </button>
+                                                    </ProcedureCard>
+                                                ))}
+                                                {totalPages > 1 && (
+                                                    <Pagination
+                                                        totalPages={totalPages}
+                                                        currentPage={currentPage}
+                                                        setPage={setCurrentPage}
+                                                    />
+                                                )}
+                                            </div>
+                                            {selectedProcedures.length > 0 && (
+                                                <div>
+                                                    <h4>Procedimentos Selecionados:</h4>
+                                                    {selectedProcedures.map(proc => (
+                                                        <SelectedProcedure key={proc.id}>
+                                                            <span>{proc.description}</span>
+                                                            <button onClick={() => handleAddProcedure(proc)}>
+                                                                Remover
+                                                            </button>
+                                                        </SelectedProcedure>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="edit-mode-controls">
+                                                <button
+                                                    onClick={() => setShowAddProcedures(!showAddProcedures)}
+                                                    className="toggle-button"
+                                                >
+                                                    {showAddProcedures
+                                                        ? `Ver Agendados (${selectedProcedures.length})`
+                                                        : `Adicionar Procedimentos (${procedimentos.length})`}
+                                                </button>
+                                            </div>
+
+                                            {showAddProcedures ? (
+                                                <>
+                                                    <SearchBar search={search} setSearch={setSearch} />
+                                                    <div className="procedures-list">
+                                                        <h3>Procedimentos Disponíveis</h3>
+                                                        {paginatedProcedures.map(proc => (
+                                                            <ProcedureCard key={proc.id}>
+                                                                <div className="procedure-info">
+                                                                    <h4>{proc.nomeProfissional}</h4>
+                                                                    <p>{proc.description}</p>
+                                                                </div>
+                                                                <button
+                                                                    onClick={() => handleAddProcedure(proc)}
+                                                                    disabled={selectedProcedures.some(p => p.id === proc.id)}
+                                                                >
+                                                                    {selectedProcedures.some(p => p.id === proc.id)
+                                                                        ? 'Já Adicionado'
+                                                                        : 'Adicionar'}
+                                                                </button>
+                                                            </ProcedureCard>
+                                                        ))}
+                                                        {totalPages > 1 && (
+                                                            <Pagination
+                                                                totalPages={totalPages}
+                                                                currentPage={currentPage}
+                                                                setPage={setCurrentPage}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <div className="existing-procedures">
+                                                    <h3>Procedimentos Agendados</h3>
+                                                    {selectedProcedures.length === 0 ? (
+                                                        <p className="empty-message">Nenhum procedimento agendado</p>
+                                                    ) : (
+                                                        selectedProcedures.map(proc => (
+                                                            <SelectedProcedure key={proc.id}>
+                                                                <span>{proc.description}</span>
+                                                                <button
+                                                                    onClick={() => handleRemoveProcedure(proc)}
+                                                                    className="remove-btn"
+                                                                >
+                                                                    Remover
+                                                                </button>
+                                                            </SelectedProcedure>
+                                                        ))
+                                                    )}
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+
+                                    <SaveButton
+                                        onClick={handleSaveAgenda}
+                                        disabled={modalMode === 'add' && selectedProcedures.length === 0}
+                                    >
+                                        {modalMode === 'add' ? 'Salvar Agenda' : 'Atualizar Agenda'}
+                                    </SaveButton>
+                                </ModalContent>
+                            </ModalOverlay>
+                        </Modal>
+                    </CalendarContainer>
+                </GradientBackground>
+            )}
+        </>
     );
 };
 
