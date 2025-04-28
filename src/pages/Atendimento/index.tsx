@@ -148,8 +148,8 @@ const Atendimento: React.FC<PageProps> = ({ user }) => {
                     <QueueList>
                         {normalQueue.map((item) => (
                             <QueueItem key={item.id}>
-                                <span>{item.number}</span>
-                                <CallButton onClick={() => openModal(item.number!)}>Chamar</CallButton>
+                                <span>{item.code}</span>
+                                <CallButton onClick={() => openModal(item.code!)}>Chamar</CallButton>
                             </QueueItem>
                         ))}
                     </QueueList>
@@ -159,8 +159,8 @@ const Atendimento: React.FC<PageProps> = ({ user }) => {
                     <QueueList>
                         {preferentialQueue.map((item) => (
                             <QueueItem key={item.id}>
-                                <span>{item.number}</span>
-                                <CallButton onClick={() => openModal(item.number!)}>Chamar</CallButton>
+                                <span>{item.code}</span>
+                                <CallButton onClick={() => openModal(item.code!)}>Chamar</CallButton>
                             </QueueItem>
                         ))}
                     </QueueList>
@@ -185,12 +185,12 @@ const Atendimento: React.FC<PageProps> = ({ user }) => {
                     }
                 }}
                 contentLabel="Iniciar Atendimento"
-                ariaHideApp={false} // Ajuste conforme sua configuração
+                ariaHideApp={false}
             >
                 <Formik
                     initialValues={{
                         clientId: '',
-                        ticketNumber: '',
+                        code: '',
                         nome: '',
                         description: '',
                         preco: 0,

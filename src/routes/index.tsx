@@ -15,6 +15,7 @@ import Atendimento from "../pages/Atendimento";
 import Painel from "../pages/Painel";
 import Procedimentos from "../pages/Procedimentos";
 import Agenda from "../pages/Agenda";
+import Senha from "../pages/Senha";
 
 const AppRoutes = () => (
     <Routes>
@@ -27,6 +28,7 @@ const AppRoutes = () => (
         <Route path="/painel" element={<AuthRoute><Painel /></AuthRoute>} />
         <Route path='/perfil' element={<AuthRoute><MainLayout><Perfil /></MainLayout></AuthRoute>} />
         <Route path='/procedimentos' element={<AuthRoute><MainLayout><Procedimentos /></MainLayout></AuthRoute>} />
+        <Route path='/senhas' element={<AuthRoute><MainLayout><Senha /></MainLayout></AuthRoute>} />
         <Route path='/not-authorized' element={<NotAuthorized />} />
         <Route path="*" element={<NotFound />} />
     </Routes>

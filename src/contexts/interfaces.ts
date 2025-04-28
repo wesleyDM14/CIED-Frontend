@@ -35,11 +35,15 @@ export interface Cliente {
 
 export interface Ticket {
     id?: string;
-    number?: string;
+    code?: string;
     type?: "NORMAL" | "PREFERENCIAL";
     status?: "WAITING" | "CALLED" | "FINISHED";
     serviceCounter?: string;
-    room?: string;
+    createdAt?: Date;
+    calledAt?: Date;
+    scheduleAt?: Date;
+    procedimentoId?: string;
+    updatedAt?: Date;
 }
 
 export interface Procedimento {

@@ -55,26 +55,20 @@ export const removerProcedimentoAgenda = async (user: User, scheduleId: string, 
     });
 };
 
-export const acrescentarProcedimentoAgenda = async (
-    user: User,
-    scheduleId: string,
-    procedimentoId: string
-) => {
-    try {
-        const response = await axios.post(
-            `${import.meta.env.VITE_BASE_URL}/api/agenda/procedimento`,
-            { scheduleId, procedimentoId },
-            {
-                headers: {
-                    "Authorization": `Bearer ${user.accessToken}`,
-                    "Content-Type": "application/json"
-                }
-            }
-        );
-
-        return response.data;
-    } catch (error) {
-        console.error('Erro ao adicionar procedimento:', error);
-        throw error;
-    }
-};
+export const getAgendamentoDiario = async (user: User, date: Date, setAgendamentoDiario: (agendaDiaria: Schedule) => void) => {
+    const formattedDate = date.toISOString().split('T')[0];
+    await axios.get(`${import.meta.env.VITE_BASE_URL}/api/agendamento/diaria`, {
+        params: {
+            date: formattedDate
+        },
+        headers: {
+            "Authorization": `Bearer ${user.accessToken}`
+        }
+    }).then((response) => {
+        const { data } = response;
+        setAgendamentoDiario(data);
+    }).catch((err) => {
+        console.error(err.response.data.message);
+        window.alert(err.response.data.message);
+    });
+}

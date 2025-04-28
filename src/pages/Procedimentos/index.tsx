@@ -58,15 +58,21 @@ const Procedimentos: React.FC<PageProps> = ({ navigate, user }) => {
     }
 
     useEffect(() => {
-        if (loading) {
-            try {
-                getProcedimentos(user!, setProcedimentos);
-            } catch (err) {
-                console.log(err);
-            } finally {
-                setLoading(false);
+
+        const fetchData = async () => {
+            if (loading) {
+                try {
+                    await getProcedimentos(user!, setProcedimentos);
+                } catch (err) {
+                    console.log(err);
+                } finally {
+                    setLoading(false);
+                }
             }
         }
+
+        fetchData();
+
     }, [user, loading]);
 
     return (
@@ -94,7 +100,7 @@ const Procedimentos: React.FC<PageProps> = ({ navigate, user }) => {
                                             <FaClipboardList />
                                         </IconWrapper>
                                         <NoContentActionContainer>
-                                            <TextContent>Nenhum Cliente encontrado.</TextContent>
+                                            <TextContent>Nenhum Procedimento encontrado.</TextContent>
                                             <AddProcedimentoButton onClick={openAddModal}>
                                                 <FaPlus color={colors.icon} fontSize={15} className="icon-add-button" /> Novo Procedimento
                                             </AddProcedimentoButton>
