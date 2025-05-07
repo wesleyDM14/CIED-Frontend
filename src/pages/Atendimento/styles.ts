@@ -40,8 +40,8 @@ export const Title = styled.h1`
 
 
 export const QueueContainer = styled.div`
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-direction: column;
     gap: 10px;
     margin-bottom: 10px;
 `;
@@ -184,4 +184,18 @@ export const Button = styled.button<ButtonProps>`
     &:hover {
         opacity: 0.9;
     }
+`;
+
+export const QueueCard = styled.div`
+    background-color: white; /* Cor de fundo branca */
+    border-radius: 8px; /* Bordas arredondadas */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    padding: 16px; /* Espaçamento interno */
+    margin: 8px; /* Espaçamento entre os cards */
+    transition: box-shadow 0.3s ease-in-out; /* Transição suave para a sombra */
+
+    /* Efeito de hover para aumentar a sombra */
+    &:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
 `;

@@ -11,6 +11,7 @@ import {
     FormGroup,
     Header,
     ModalHeader,
+    QueueCard,
     QueueContainer,
     QueueItem,
     QueueList,
@@ -21,7 +22,7 @@ import {
 import { colors, ModalStyles } from "../../utils/GlobalStyles";
 import Modal from 'react-modal';
 import { HiOutlineQueueList } from 'react-icons/hi2';
-import { PageProps, Ticket } from "../../contexts/interfaces";
+import { PageProps, QueueItemInterface, Ticket } from "../../contexts/interfaces";
 import { callSpecificTicket, getTicketsQueue } from "../../services/atendimentoService";
 import { io } from "socket.io-client";
 import { useDispatch } from "react-redux";
@@ -46,9 +47,7 @@ const Atendimento: React.FC<PageProps> = ({ user }) => {
 
     const serviceCounter = useSelector(selectServiceCounter);
 
-    const [normalQueue, setNormalQueue] = useState<Ticket[]>([]);
-
-    const [preferentialQueue, setPreferentialQueue] = useState<Ticket[]>([]);
+    const [queues, setQueues] = useState<QueueItemInterface[]>([]);
 
     const [isModalOpen, setModalOpen] = useState(false);
     const [selectedSenha, setSelectedSenha] = useState<string>('');
@@ -88,24 +87,49 @@ const Atendimento: React.FC<PageProps> = ({ user }) => {
 
     useEffect(() => {
         const fetchData = () => {
-            getTicketsQueue(user!, setNormalQueue, setPreferentialQueue)
+            getTicketsQueue(user!, setQueues)
                 .catch((error) => console.error("Erro ao buscar filas:", error));
         };
 
         fetchData();
 
-        socket.on("ticket:called", fetchData);
-        socket.on("ticket:created", (ticket: Ticket) => {
-            if (ticket.type === "NORMAL") {
-                setNormalQueue((prevQueue) => [...prevQueue, ticket]);
-            } else {
-                setPreferentialQueue((prevQueue) => [...prevQueue, ticket]);
-            }
-        });
+        const createdHandler = (ticket: Ticket) => {
+            setQueues((prevQueues) => {
+                const updatedQueues = [...prevQueues];
+                const procedureName = ticket.procedimento?.description || '';
+                const profissionalName = ticket.procedimento?.nomeProfissional || '';
 
+                let queue = updatedQueues.find(q => q.nome === procedureName);
+
+                if (!queue) {
+                    queue = { procedimentoId: ticket.procedimento?.id || '', nome: procedureName, profissional: profissionalName, normal: [], preferencial: [] };
+                    updatedQueues.push(queue);
+                }
+
+                // Verifica se a senha já existe na fila antes de adicionar
+                const existsInQueue = ticket.type === "NORMAL"
+                    ? queue.normal.some(t => t.code === ticket.code)
+                    : queue.preferencial.some(t => t.code === ticket.code);
+
+                if (!existsInQueue) {
+                    if (ticket.type === "NORMAL") {
+                        queue.normal.push(ticket);
+                    } else if (ticket.type === "PREFERENCIAL") {
+                        queue.preferencial.push(ticket);
+                    }
+                }
+
+                return updatedQueues;
+            });
+        };
+
+        socket.on("ticket:called", fetchData);
+        socket.on("ticket:created", createdHandler);
+
+        // Cleanup para garantir que o ouvinte seja removido ao desmontar o componente ou ao mudar o usuário
         return () => {
-            socket.off("ticket:called");
-            socket.off("ticket:created");
+            socket.off("ticket:called", fetchData);
+            socket.off("ticket:created", createdHandler);
         };
     }, [user]);
 
@@ -143,28 +167,33 @@ const Atendimento: React.FC<PageProps> = ({ user }) => {
                 )}
             </Header>
             <QueueContainer>
-                <QueueSection>
-                    <SectionTitle>Fila Normal</SectionTitle>
-                    <QueueList>
-                        {normalQueue.map((item) => (
-                            <QueueItem key={item.id}>
-                                <span>{item.code}</span>
-                                <CallButton onClick={() => openModal(item.code!)}>Chamar</CallButton>
-                            </QueueItem>
-                        ))}
-                    </QueueList>
-                </QueueSection>
-                <QueueSection>
-                    <SectionTitle>Fila Preferencial</SectionTitle>
-                    <QueueList>
-                        {preferentialQueue.map((item) => (
-                            <QueueItem key={item.id}>
-                                <span>{item.code}</span>
-                                <CallButton onClick={() => openModal(item.code!)}>Chamar</CallButton>
-                            </QueueItem>
-                        ))}
-                    </QueueList>
-                </QueueSection>
+                {queues.map((queue) => (
+                    <QueueCard key={queue.procedimentoId}>
+                        <SectionTitle>{queue.nome}</SectionTitle>
+                        <QueueSection>
+                            <SectionTitle>Fila Normal</SectionTitle>
+                            <QueueList>
+                                {queue.normal.map((item) => (
+                                    <QueueItem key={item.id}>
+                                        <span>{item.code}</span>
+                                        <CallButton onClick={() => openModal(item.code!)}>Chamar</CallButton>
+                                    </QueueItem>
+                                ))}
+                            </QueueList>
+                        </QueueSection>
+                        <QueueSection>
+                            <SectionTitle>Fila Preferencial</SectionTitle>
+                            <QueueList>
+                                {queue.preferencial.map((item) => (
+                                    <QueueItem key={item.id}>
+                                        <span>{item.code}</span>
+                                        <CallButton onClick={() => openModal(item.code!)}>Chamar</CallButton>
+                                    </QueueItem>
+                                ))}
+                            </QueueList>
+                        </QueueSection>
+                    </QueueCard>
+                ))}
             </QueueContainer>
             <ButtonGroup>
                 <AutoCallButton onClick={() => { }}>Chamar Próxima Senha</AutoCallButton>

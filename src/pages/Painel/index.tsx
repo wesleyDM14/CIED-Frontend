@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import {
+    AdContent,
     AdPanel,
+    FadeAnimation,
     GuicheDisplay,
     HeaderSenha,
     LastCallItem,
@@ -9,16 +11,31 @@ import {
     PanelContainer,
     SenhaDisplay,
 } from "./styles";
-import { colors } from "../../utils/GlobalStyles";
 import { io } from "socket.io-client";
 
 const socket = io(import.meta.env.VITE_BASE_URL);
+
+const ads: string[] = ["/ads/ad1.jpg", "/ads/ad2.jpg", "/ads/ad3.mp4", "/ads/ad4.jpg", "/ads/ad5.jpg"];
 
 const Painel: React.FC = () => {
 
     const [currentTicket, setCurrentTicket] = useState<{ number: string; serviceCounter: string } | null>(null);
     const [lastCalls, setLastCalls] = useState<{ number: string; serviceCounter: string }[]>([]);
     const [userInteracted, setUserInteracted] = useState(false);
+    const [adIndex, setAdIndex] = useState(0);
+
+    const currentAd = ads[adIndex];
+    const isVideo = currentAd.endsWith(".mp4") || currentAd.endsWith(".webm");
+
+    useEffect(() => {
+        let timeout: NodeJS.Timeout;
+        if (!isVideo) {
+            timeout = setTimeout(() => {
+                setAdIndex((prev) => (prev + 1) % ads.length);
+            }, 10000);
+        }
+        return () => clearTimeout(timeout);
+    }, [isVideo, adIndex]);
 
     useEffect(() => {
         const handleInteraction = () => {
@@ -68,7 +85,7 @@ const Painel: React.FC = () => {
 
                 setTimeout(() => {
                     synth.speak(utterance);
-                }, 3000); // Segunda chamada após 3 segundos
+                }, 3000);
             };
 
             if (voices.length === 0) {
@@ -91,15 +108,21 @@ const Painel: React.FC = () => {
                 </HeaderSenha>
             )}
             <AdPanel>
-                {/* Seu conteúdo de vídeo/animação */}
-                <div style={{
-                    backgroundColor: colors.background,
-                    padding: '1rem',
-                    borderRadius: '8px',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                }}>
-                    <p style={{ color: colors.mainText, textAlign: 'center' }}>Espaço para propaganda</p>
-                </div>
+                <FadeAnimation key={adIndex}>
+                    {
+                        isVideo ? (
+                            <AdContent as="video"
+                                src={currentAd}
+                                autoPlay
+                                muted
+                                playsInline
+                                onEnded={() => setAdIndex((prev) => (prev + 1) % ads.length)}
+                            />
+                        ) : (
+                            <AdContent as="img" src={currentAd} alt="Publicidade" />
+                        )
+                    }
+                </FadeAnimation>
             </AdPanel>
             <LastCalls>
                 <LastCallsTitle>Últimas Chamadas</LastCallsTitle>

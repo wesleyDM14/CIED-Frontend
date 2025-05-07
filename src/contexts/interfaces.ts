@@ -44,6 +44,7 @@ export interface Ticket {
     scheduleAt?: Date;
     procedimentoId?: string;
     updatedAt?: Date;
+    procedimento?: Procedimento
 }
 
 export interface Procedimento {
@@ -66,3 +67,11 @@ export interface Schedule {
 export interface ProcedimentoToSave {
     procedimentoId: string;
 }
+
+export interface QueueItemInterface {
+    procedimentoId: string;
+    nome: string;
+    profissional: string;
+    normal: Ticket[];
+    preferencial: Ticket[];
+};
