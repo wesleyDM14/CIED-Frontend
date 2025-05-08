@@ -2,16 +2,23 @@ import { useEffect, useState } from "react";
 import {
     AdContent,
     AdPanel,
+    DataContainer,
     FadeAnimation,
     GuicheDisplay,
     HeaderSenha,
+    HoraContainer,
     LastCallItem,
     LastCalls,
     LastCallsTitle,
+    LogoContainer,
+    LogoImg,
     PanelContainer,
     SenhaDisplay,
+    TimeInfoContainer,
 } from "./styles";
+import logo from '../../assets/CIED.png';
 import { io } from "socket.io-client";
+import { FiCalendar, FiClock } from "react-icons/fi";
 
 const socket = io(import.meta.env.VITE_BASE_URL);
 
@@ -26,6 +33,32 @@ const Painel: React.FC = () => {
 
     const currentAd = ads[adIndex];
     const isVideo = currentAd.endsWith(".mp4") || currentAd.endsWith(".webm");
+
+    const [dataAtual, setDataAtual] = useState('');
+    const [horaAtual, setHoraAtual] = useState('');
+
+    useEffect(() => {
+        const atualizarDataHora = () => {
+            const agora = new Date();
+            const opcoesData: Intl.DateTimeFormatOptions = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+
+            const dataFormatada = agora.toLocaleDateString('pt-BR', opcoesData);
+            const horaFormatada = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+            setDataAtual(dataFormatada);
+            setHoraAtual(horaFormatada);
+        };
+
+        atualizarDataHora();
+        const intervalo = setInterval(atualizarDataHora, 1000);
+
+        return () => clearInterval(intervalo);
+    }, []);
 
     useEffect(() => {
         let timeout: NodeJS.Timeout;
@@ -67,25 +100,48 @@ const Painel: React.FC = () => {
             let voices = synth.getVoices();
 
             const getFemaleVoice = () => {
-                return voices.find(voice =>
-                    voice.lang.includes("pt") &&
-                    (voice.name.toLowerCase().includes("female") ||
-                        voice.name.toLowerCase().includes("mulher") ||
-                        voice.name.toLowerCase().includes("brasil"))
-                ) || voices[0];
+                return (
+                    voices.find(voice =>
+                        voice.lang.includes("pt") &&
+                        (voice.name.toLowerCase().includes("female") ||
+                            voice.name.toLowerCase().includes("mulher") ||
+                            voice.name.toLowerCase().includes("brasil"))
+                    ) || voices[0]
+                );
             };
 
             const speak = () => {
-                const utterance = new SpeechSynthesisUtterance(`Senha ${currentTicket.number} guichê ${currentTicket.serviceCounter}`);
-                utterance.voice = getFemaleVoice();
-                utterance.lang = "pt-BR";
-                utterance.rate = 1.0;
+                const senha = currentTicket.number;
 
-                synth.speak(utterance);
+                // Substituindo o "E" por "É" e separando as letras e números
+                const letras = senha
+                    .replace(/[0-9]/g, '') // Remove os números para pegar só as letras
+                    .split('') // Divide a senha em letras
+                    .map(l => l.toUpperCase() === 'E' ? 'É' : l.toUpperCase()) // Substitui E por É
+                    .join(' '); // Junta as letras com espaço entre elas
 
-                setTimeout(() => {
-                    synth.speak(utterance);
-                }, 3000);
+                const numeros = senha.replace(/[^\d]/g, ''); // Pega apenas os números da senha
+
+                const utterances: SpeechSynthesisUtterance[] = [
+                    new SpeechSynthesisUtterance("Senha"),
+                    new SpeechSynthesisUtterance(letras),
+                    new SpeechSynthesisUtterance(numeros),
+                    new SpeechSynthesisUtterance(`Guichê ${currentTicket.serviceCounter}`)
+                ];
+
+                const voice = getFemaleVoice();
+                for (const utterance of utterances) {
+                    utterance.voice = voice;
+                    utterance.lang = "pt-BR";
+                    utterance.rate = 1.2; // Ajuste na taxa para melhor clareza
+                }
+
+                // Garantindo pausas adequadas entre a leitura das partes da frase
+                let delay = 0;
+                for (const utterance of utterances) {
+                    setTimeout(() => synth.speak(utterance), delay);
+                    delay += utterance.text.length + 100; // Adiciona tempo entre falas
+                }
             };
 
             if (voices.length === 0) {
@@ -99,14 +155,21 @@ const Painel: React.FC = () => {
         }
     }, [currentTicket, userInteracted]);
 
+
     return (
         <PanelContainer>
-            {currentTicket && (
-                <HeaderSenha>
+            <LogoContainer>
+                <LogoImg src={logo} alt="Logo Cied" />
+            </LogoContainer>
+            <HeaderSenha>
+                <GuicheDisplay>Senha:</GuicheDisplay>
+                {currentTicket && (
                     <SenhaDisplay>{currentTicket.number}</SenhaDisplay>
+                )}
+                {currentTicket && (
                     <GuicheDisplay>Guichê: {currentTicket.serviceCounter}</GuicheDisplay>
-                </HeaderSenha>
-            )}
+                )}
+            </HeaderSenha>
             <AdPanel>
                 <FadeAnimation key={adIndex}>
                     {
@@ -135,6 +198,16 @@ const Painel: React.FC = () => {
                     ))}
                 </ul>
             </LastCalls>
+            <TimeInfoContainer>
+                <DataContainer>
+                    <FiCalendar />
+                    {dataAtual}
+                </DataContainer>
+                <HoraContainer>
+                    <FiClock />
+                    {horaAtual}
+                </HoraContainer>
+            </TimeInfoContainer>
         </PanelContainer>
     );
 }

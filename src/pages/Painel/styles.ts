@@ -12,7 +12,6 @@ export const PanelContainer = styled.div`
         "time time";
     grid-template-columns: 2fr 0.5fr;
     grid-template-rows: 0.5fr 1.5fr 3fr 0.5fr;
-    gap: 1rem;
 
     @media (max-width: 768px) {
         grid-template-areas:
@@ -27,10 +26,9 @@ export const LastCalls = styled.div`
     grid-area: last;
     background-color: ${colors.white};
     border: 1px solid ${colors.slimGray};
-    border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     overflow-y: auto;
-    height: 99%;
+    height: 100%;
 `;
 
 export const AdPanel = styled.div`
@@ -68,9 +66,9 @@ export const LastCallItem = styled.li`
 `;
 
 export const SenhaDisplay = styled.h1`
-    font-size: 9rem;
+    font-size: 6rem;
     font-weight: bold;
-    color: ${colors.mainText};
+    color: ${colors.white};
     margin: 0;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
 
@@ -81,7 +79,7 @@ export const SenhaDisplay = styled.h1`
 
 export const GuicheDisplay = styled.h5`
     font-size: 3rem;
-    color: ${colors.btnSecondary};
+    color: ${colors.white};
 
     @media (max-width: 768px) {
         font-size: 0.8rem;
@@ -94,12 +92,12 @@ export const HeaderSenha = styled.div`
     justify-content: center;
     flex-direction: column;
     align-items: center;
+    background-color: ${colors.btnSecondary};
 `;
 
 export const AdContent = styled.div`
     width: 100%;
     height: 100%;
-    border-radius: 8px;
 
     video, img {
         width: 100%;
@@ -119,12 +117,57 @@ export const FadeAnimation = styled.div`
     animation: ${fadeIn} 0.5s ease-in-out;
 `;
 
-export const LogoContainer = styled.div``;
+export const LogoContainer = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    grid-area: logo;
+`;
 
-export const LogoImg = styled.img``;
+export const LogoImg = styled.img`
+    width: 300px;
+    height: auto;
+    margin: 5px;
+`;
 
-export const TimeInfoContainer = styled.div``;
+export const TimeInfoContainer = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    background-color: ${colors.btnSecondary};
+    grid-area: time;
+`;
 
-export const DataContainer = styled.div``;
+export const DataContainer = styled.div`
+    display: flex;
+    align-items: center;
+    font-size: 2rem;
+    color: ${colors.white};
+    margin-right: 2rem;
 
-export const HoraContainer = styled.div``;
+    svg {
+        margin-right: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+        font-size: 0.8rem;
+        margin-right: 1rem;
+    }
+`;
+
+export const HoraContainer = styled.div`
+    display: flex;
+    align-items: center;
+    font-size: 3rem;
+    color: ${colors.white};
+    font-weight: bold;
+
+    svg {
+        margin-right: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+        font-size: 1rem;
+    }
+`;

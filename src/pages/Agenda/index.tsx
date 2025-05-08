@@ -242,7 +242,7 @@ const Agenda: React.FC<PageProps> = ({ user }) => {
                                             </ScheduleList>
                                         )}
 
-                                        {isCurrentMonth && (
+                                        {isCurrentMonth && !schedule &&(
                                             <AddButton onClick={(e) => handleAddDate(day, e)}>
                                                 <FaPlus />
                                             </AddButton>
