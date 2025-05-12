@@ -289,6 +289,8 @@ export const ModalContent = styled.div`
   background: white;
   border-radius: 8px;
   position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
 
   .edit-mode-controls {
     margin: 1rem 0;

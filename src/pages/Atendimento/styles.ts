@@ -9,6 +9,10 @@ export const AtendimentoContainer = styled.div`
     padding: 2rem;
     background-color: ${colors.background};
     min-height: 100vh;
+
+    @media (max-width: 768px) {
+        padding: 0.5rem;
+    }
 `;
 
 export const Header = styled.div`
@@ -33,8 +37,12 @@ export const Title = styled.h1`
         margin-right: 5px;
     }
 
-    @media only screen and (max-width: 978px){
-        font-size: 18px;
+    @media (max-width: 768px) {
+        font-size: 1rem;
+    }
+
+    @media (min-width: 1440px) {
+        font-size: 1.2rem;
     }
 `;
 
@@ -64,7 +72,12 @@ export const QueueSection = styled.div`
 
 export const SectionTitle = styled.h2`
     color: ${colors.title};
+    font-size: 1rem;
     margin-bottom: 0.5rem;
+
+    @media (max-width: 768px) {
+        font-size: 1rem;
+    }
 `;
 
 export const QueueList = styled.ul`
@@ -79,9 +92,14 @@ export const QueueItem = styled.li`
     align-items: center;
     padding: 0.5rem 0;
     border-bottom: 1px solid ${colors.slimGray};
+    font-size: 1rem;
     
     &:last-child {
         border-bottom: none;
+    }
+
+    @media (max-width: 768px) {
+        font-size: 0.8rem;
     }
 `;
 

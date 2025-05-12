@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import {
     AtendimentoContainer,
-    AutoCallButton,
     Button,
     ButtonContainer,
     ButtonGroup,
@@ -173,12 +172,24 @@ const Atendimento: React.FC<PageProps> = ({ user }) => {
             });
         };
 
+        const finishedHandler = (finishedTicket: { code: string }) => {
+            setQueues((prevQueues) =>
+                prevQueues.map(queue => ({
+                    ...queue,
+                    normal: queue.normal.filter(t => t.code !== finishedTicket.code),
+                    preferencial: queue.preferencial.filter(t => t.code !== finishedTicket.code)
+                }))
+            );
+        };
+
         socket.on("ticket:called", fetchData);
         socket.on("ticket:created", createdHandler);
+        socket.on("ticket:finished", finishedHandler);
 
         return () => {
             socket.off("ticket:called", fetchData);
             socket.off("ticket:created", createdHandler);
+            socket.off("ticket:finished", finishedHandler);
         };
     }, [user]);
 
@@ -249,9 +260,6 @@ const Atendimento: React.FC<PageProps> = ({ user }) => {
                                 </QueueCard>
                             ))}
                         </QueueContainer>
-                        <ButtonGroup>
-                            <AutoCallButton onClick={() => { }}>Chamar Próxima Senha</AutoCallButton>
-                        </ButtonGroup>
                         <Modal
                             isOpen={isModalOpen}
                             onRequestClose={closeModal}
@@ -264,7 +272,9 @@ const Atendimento: React.FC<PageProps> = ({ user }) => {
                                     transform: 'translate(-50%, -50%)',
                                     maxWidth: '700px',
                                     width: '100%',
-                                    padding: '2rem'
+                                    padding: '2rem',
+                                    maxHeight: '90vh',
+                                    overflowY: 'auto',
                                 }
                             }}
                             contentLabel="Iniciar Atendimento"
@@ -503,6 +513,7 @@ const Atendimento: React.FC<PageProps> = ({ user }) => {
 
                                             <ButtonContainer>
                                                 <Button type="submit" disabled={isSubmitting}>Gerar Ficha</Button>
+                                                <Button type="button" onClick={() => finalizeTicket(user!, selectedSenha, closeModal)}>Finalizar Senha</Button>
                                                 <Button type="button" onClick={() => recalLastTicket(user!, selectedSenha, selectedCounter)}>Chamar Novamente</Button>
                                                 <Button type="button" $cancel onClick={closeModal}>Cancelar</Button>
                                             </ButtonContainer>

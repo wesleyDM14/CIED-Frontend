@@ -15,10 +15,13 @@ export const PanelContainer = styled.div`
 
     @media (max-width: 768px) {
         grid-template-areas:
-        "ad ad"
-        "senha last";
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 3fr 0.5fr;
+        "logo"
+        "senha"
+        "ad"
+        "last"
+        "time";
+        grid-template-columns: 1fr;
+        grid-template-rows: 0.2fr 0.5fr 3fr 1fr 0.2fr;
     }
 `;
 
@@ -44,12 +47,17 @@ export const AdPanel = styled.div`
 export const LastCallsTitle = styled.h3`
     text-align: center;
     color: ${colors.title};
-    margin: 1rem 0;
-    font-size: 30px;
+    margin: 0.5rem 0;
+    font-size: 20px;
 
     @media (max-width: 768px) {
-        font-size: 0.5rem;
+        font-size: 0.8rem;
         margin: 0.1rem 0;
+    }
+
+    @media (min-width: 1440px) {
+        font-size: 30px;
+        margin: 1rem 0;
     }
 `;
 
@@ -58,15 +66,19 @@ export const LastCallItem = styled.li`
     color: ${colors.mainText};
     margin-left: 2rem;
     font-weight: bold;
-    font-size: 22px;
+    font-size: 18px;
 
     @media (max-width: 768px) {
-        font-size: 8px;
+        font-size: 12px;
+    }
+
+    @media (min-width: 1440px) {
+        font-size: 22px;
     }
 `;
 
 export const SenhaDisplay = styled.h1`
-    font-size: 6rem;
+    font-size: 3rem;
     font-weight: bold;
     color: ${colors.white};
     margin: 0;
@@ -74,15 +86,25 @@ export const SenhaDisplay = styled.h1`
 
     @media (max-width: 768px) {
         font-size: 1rem;
+        margin-left: 5px;
+    }
+
+    @media (min-width: 1440px) {
+        font-size: 6rem;
     }
 `;
 
 export const GuicheDisplay = styled.h5`
-    font-size: 3rem;
+    font-size: 2rem;
     color: ${colors.white};
 
     @media (max-width: 768px) {
         font-size: 0.8rem;
+        margin-left: 5px;
+    }
+
+    @media (min-width: 1440px) {
+        font-size: 3rem;
     }
 `;
 
@@ -93,6 +115,10 @@ export const HeaderSenha = styled.div`
     flex-direction: column;
     align-items: center;
     background-color: ${colors.btnSecondary};
+
+    @media (max-width: 768px) {
+        flex-direction: row;
+    }
 `;
 
 export const AdContent = styled.div`
@@ -126,9 +152,17 @@ export const LogoContainer = styled.div`
 `;
 
 export const LogoImg = styled.img`
-    width: 300px;
+    width: 200px;
     height: auto;
     margin: 5px;
+
+    @media (max-width: 768px) {
+        width: 100px;
+    }
+
+    @media (min-width: 1440px) {
+        width: 300px;
+    }
 `;
 
 export const TimeInfoContainer = styled.div`
@@ -142,7 +176,7 @@ export const TimeInfoContainer = styled.div`
 export const DataContainer = styled.div`
     display: flex;
     align-items: center;
-    font-size: 2rem;
+    font-size: 1.2rem;
     color: ${colors.white};
     margin-right: 2rem;
 
@@ -154,12 +188,16 @@ export const DataContainer = styled.div`
         font-size: 0.8rem;
         margin-right: 1rem;
     }
+
+    @media (min-width: 1440px) {
+        font-size: 3rem;
+    }
 `;
 
 export const HoraContainer = styled.div`
     display: flex;
     align-items: center;
-    font-size: 3rem;
+    font-size: 1.5rem;
     color: ${colors.white};
     font-weight: bold;
 
@@ -169,5 +207,9 @@ export const HoraContainer = styled.div`
 
     @media (max-width: 768px) {
         font-size: 1rem;
+    }
+
+    @media (min-width: 1440px) {
+        font-size: 3rem;
     }
 `;
