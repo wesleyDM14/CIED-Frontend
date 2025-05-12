@@ -22,7 +22,7 @@ import { FiCalendar, FiClock } from "react-icons/fi";
 
 const socket = io(import.meta.env.VITE_BASE_URL);
 
-const ads: string[] = ["/ads/ad1.jpg", "/ads/ad2.jpg", "/ads/ad3.mp4", "/ads/ad4.jpg", "/ads/ad5.jpg"];
+const ads: string[] = ["/ads/ad1.png", "/ads/ad2.jpg", "/ads/ad3.mp4", "/ads/ad4.jpg", "/ads/ad5.mp4"];
 
 const Painel: React.FC = () => {
 

@@ -109,7 +109,7 @@ const Atendimento: React.FC<PageProps> = ({ user }) => {
             setFieldValue('email', clienteSelecionado.email || '');
             setFieldValue('phone', clienteSelecionado.phone || '');
             setFieldValue('rg', clienteSelecionado.rg || '');
-            setFieldValue('dataNascimento', clienteSelecionado.dataNascimento?.split('T')[0] || '');
+            setFieldValue('dataNascimento', clienteSelecionado.dataNascimento?.toDateString().split('T')[0] || '');
             setFieldValue('logradouro', clienteSelecionado.logradouro || '');
             setFieldValue('bairro', clienteSelecionado.bairro || '');
             setFieldValue('cidade', clienteSelecionado.cidade || '');
@@ -311,7 +311,7 @@ const Atendimento: React.FC<PageProps> = ({ user }) => {
                                             .nullable(),
                                     })
                                 }
-                                onSubmit={async (values, { setFieldError, setSubmitting }) => {
+                                onSubmit={async (values) => {
                                     let clientId = values.clientId;
 
                                     const dataNascimento = values.dataNascimento
@@ -322,6 +322,7 @@ const Atendimento: React.FC<PageProps> = ({ user }) => {
 
                                     if (!clientId && values.name) {
                                         try {
+                                            console.log(selectedClient);
                                             const newClient = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/clients/create`, {
                                                 ...values,
                                                 dataNascimento,
