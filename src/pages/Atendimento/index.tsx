@@ -513,7 +513,7 @@ const Atendimento: React.FC<PageProps> = ({ user }) => {
 
                                             <ButtonContainer>
                                                 <Button type="submit" disabled={isSubmitting}>Gerar Ficha</Button>
-                                                <Button type="button" onClick={() => finalizeTicket(user!, selectedSenha, closeModal)}>Finalizar Senha</Button>
+                                                <Button type="button" onClick={() => finalizeTicket(user!, ticketId, closeModal)}>Finalizar Senha</Button>
                                                 <Button type="button" onClick={() => recalLastTicket(user!, selectedSenha, selectedCounter)}>Chamar Novamente</Button>
                                                 <Button type="button" $cancel onClick={closeModal}>Cancelar</Button>
                                             </ButtonContainer>
