@@ -74,19 +74,29 @@ const Painel: React.FC = () => {
         const handleInteraction = () => {
             setUserInteracted(true);
             document.removeEventListener("click", handleInteraction);
+            document.removeEventListener("touchstart", handleInteraction);
+            document.removeEventListener("keydown", handleInteraction);
         };
 
         document.addEventListener("click", handleInteraction);
+        document.addEventListener("touchstart", handleInteraction);
+        document.addEventListener("keydown", handleInteraction);
 
         return () => {
             document.removeEventListener("click", handleInteraction);
+            document.removeEventListener("touchstart", handleInteraction);
+            document.removeEventListener("keydown", handleInteraction);
         };
     }, []);
 
     useEffect(() => {
         socket.on("ticket:called", (ticket: { number: string; serviceCounter: string }) => {
             setCurrentTicket(ticket);
-            setLastCalls(prev => [ticket, ...prev.slice(0, 4)]);
+            setLastCalls(prev => {
+                const alreadyExists = prev.some(t => t.number === ticket.number);
+                if (alreadyExists) return prev;
+                return [ticket, ...prev.slice(0, 4)];
+            });
         });
 
         return () => {
@@ -113,35 +123,28 @@ const Painel: React.FC = () => {
             const speak = () => {
                 const senha = currentTicket.number;
 
-                // Substituindo o "E" por "É" e separando as letras e números
                 const letras = senha
-                    .replace(/[0-9]/g, '') // Remove os números para pegar só as letras
-                    .split('') // Divide a senha em letras
-                    .map(l => l.toUpperCase() === 'E' ? 'É' : l.toUpperCase()) // Substitui E por É
-                    .join(' '); // Junta as letras com espaço entre elas
+                    .replace(/[0-9]/g, '')
+                    .split('')
+                    .map(l => {
+                        const upper = l.toUpperCase();
+                        if (upper === 'E') return 'É';
+                        if (upper === 'O') return 'Ó';
+                        return upper;
+                    })
+                    .join(' ');
 
-                const numeros = senha.replace(/[^\d]/g, ''); // Pega apenas os números da senha
-
-                const utterances: SpeechSynthesisUtterance[] = [
-                    new SpeechSynthesisUtterance("Senha"),
-                    new SpeechSynthesisUtterance(letras),
-                    new SpeechSynthesisUtterance(numeros),
-                    new SpeechSynthesisUtterance(`Guichê ${currentTicket.serviceCounter}`)
-                ];
+                const numeros = senha.replace(/[^\d]/g, '');
 
                 const voice = getFemaleVoice();
-                for (const utterance of utterances) {
-                    utterance.voice = voice;
-                    utterance.lang = "pt-BR";
-                    utterance.rate = 1.2; // Ajuste na taxa para melhor clareza
-                }
 
-                // Garantindo pausas adequadas entre a leitura das partes da frase
-                let delay = 0;
-                for (const utterance of utterances) {
-                    setTimeout(() => synth.speak(utterance), delay);
-                    delay += utterance.text.length + 100; // Adiciona tempo entre falas
-                }
+                const fullText = `Senha ${letras} ${numeros}, guichê ${currentTicket.serviceCounter}`;
+                const utterance = new SpeechSynthesisUtterance(fullText);
+                utterance.voice = voice;
+                utterance.lang = "pt-BR";
+                utterance.rate = 1.1;
+
+                synth.speak(utterance);
             };
 
             if (voices.length === 0) {

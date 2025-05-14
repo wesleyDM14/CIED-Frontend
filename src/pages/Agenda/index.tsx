@@ -31,6 +31,7 @@ import { getAgendamentoMensal, registraAgendaDiaria, removerProcedimentoAgenda }
 import SearchBar from "../../components/SearchBar";
 import Pagination from "../../components/Pagination";
 import Loading from "../../components/Loading";
+import { ThreeDots } from "react-loader-spinner";
 
 const Agenda: React.FC<PageProps> = ({ user }) => {
     const rootElement = document.getElementById('root');
@@ -61,6 +62,8 @@ const Agenda: React.FC<PageProps> = ({ user }) => {
     const firstDayOfGrid = startOfWeek(monthStart, { weekStartsOn: 0 });
     const lastDayOfGrid = endOfWeek(monthEnd, { weekStartsOn: 0 });
     const daysInGrid = eachDayOfInterval({ start: firstDayOfGrid, end: lastDayOfGrid });
+
+    const [salving, setSalving] = useState<boolean>(false);
 
     const weekDays = eachDayOfInterval({
         start: startOfWeek(currentDate, { locale: ptBR }),
@@ -133,19 +136,24 @@ const Agenda: React.FC<PageProps> = ({ user }) => {
     );
 
     const handleSaveAgenda = async () => {
-        if (selectedDate) {
-            try {
-                const procedimentosToSave = selectedProcedures.map((proc) => ({
-                    procedimentoId: proc.id!,
-                }));
-
-                await registraAgendaDiaria(user!, selectedDate, procedimentosToSave, closeModal, setLoading);
-            } catch (error) {
-                console.error(error);
-                alert("Erro ao registrar a agenda.");
-            }
-        } else {
+        if (!selectedDate) {
             alert("Selecione uma data.");
+            return;
+        }
+
+        try {
+            setSalving(true);
+
+            const procedimentosToSave = selectedProcedures.map((proc) => ({
+                procedimentoId: proc.id!,
+            }));
+
+            await registraAgendaDiaria(user!, selectedDate, procedimentosToSave, closeModal, setLoading);
+        } catch (error) {
+            console.error(error);
+            alert("Erro ao registrar a agenda.");
+        } finally {
+            setSalving(false);
         }
     };
 
@@ -242,7 +250,7 @@ const Agenda: React.FC<PageProps> = ({ user }) => {
                                             </ScheduleList>
                                         )}
 
-                                        {isCurrentMonth && !schedule &&(
+                                        {isCurrentMonth && !schedule && (
                                             <AddButton onClick={(e) => handleAddDate(day, e)}>
                                                 <FaPlus />
                                             </AddButton>
@@ -376,9 +384,18 @@ const Agenda: React.FC<PageProps> = ({ user }) => {
 
                                     <SaveButton
                                         onClick={handleSaveAgenda}
-                                        disabled={modalMode === 'add' && selectedProcedures.length === 0}
+                                        disabled={modalMode === 'add' && selectedProcedures.length === 0 || loading}
                                     >
-                                        {modalMode === 'add' ? 'Salvar Agenda' : 'Atualizar Agenda'}
+                                        {salving ? (
+                                            <ThreeDots
+                                                height="18"
+                                                width="40"
+                                                color="#ffffff"
+                                                wrapperStyle={{ justifyContent: 'center', alignItems: 'center' }}
+                                            />
+                                        ) : (
+                                            modalMode === 'add' ? 'Salvar Agenda' : 'Atualizar Agenda'
+                                        )}
                                     </SaveButton>
                                 </ModalContent>
                             </ModalOverlay>

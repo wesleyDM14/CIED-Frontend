@@ -10,7 +10,7 @@ export const PanelContainer = styled.div`
         "ad senha"
         "ad last"
         "time time";
-    grid-template-columns: 2fr 0.5fr;
+    grid-template-columns: 2fr 1fr;
     grid-template-rows: 0.5fr 1.5fr 3fr 0.5fr;
 
     @media (max-width: 768px) {
@@ -56,7 +56,7 @@ export const LastCallsTitle = styled.h3`
     }
 
     @media (min-width: 1440px) {
-        font-size: 30px;
+        font-size: 40px;
         margin: 1rem 0;
     }
 `;
@@ -73,7 +73,7 @@ export const LastCallItem = styled.li`
     }
 
     @media (min-width: 1440px) {
-        font-size: 22px;
+        font-size: 50px;
     }
 `;
 
@@ -90,7 +90,7 @@ export const SenhaDisplay = styled.h1`
     }
 
     @media (min-width: 1440px) {
-        font-size: 6rem;
+        font-size: 10rem;
     }
 `;
 
@@ -104,7 +104,7 @@ export const GuicheDisplay = styled.h5`
     }
 
     @media (min-width: 1440px) {
-        font-size: 3rem;
+        font-size: 4rem;
     }
 `;
 
