@@ -22,7 +22,7 @@ import { FiCalendar, FiClock } from "react-icons/fi";
 
 const socket = io(import.meta.env.VITE_BASE_URL);
 
-const ads: string[] = ["/ads/ad1.png", "/ads/ad6.mp4","/ads/ad2.jpg", "/ads/ad3.mp4", "/ads/ad4.jpg", "/ads/ad5.mp4"];
+const ads: string[] = ["/ads/ad6.mp4", "/ads/ad7.jpg"];
 
 const Painel: React.FC = () => {
 
@@ -65,7 +65,7 @@ const Painel: React.FC = () => {
         if (!isVideo) {
             timeout = setTimeout(() => {
                 setAdIndex((prev) => (prev + 1) % ads.length);
-            }, 10000);
+            }, 60000);
         }
         return () => clearTimeout(timeout);
     }, [isVideo, adIndex]);
