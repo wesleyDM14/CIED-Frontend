@@ -196,7 +196,6 @@ const Painel: React.FC = () => {
                     {lastCalls.map((ticket, index) => (
                         <LastCallItem key={index}>
                             <span>Senha: {ticket.number}</span>
-                            <small> Guichê: {ticket.serviceCounter}</small>
                         </LastCallItem>
                     ))}
                 </ul>

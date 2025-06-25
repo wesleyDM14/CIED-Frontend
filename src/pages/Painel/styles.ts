@@ -56,7 +56,7 @@ export const LastCallsTitle = styled.h3`
     }
 
     @media (min-width: 1440px) {
-        font-size: 40px;
+        font-size: 50px;
         margin: 1rem 0;
     }
 `;
@@ -73,7 +73,7 @@ export const LastCallItem = styled.li`
     }
 
     @media (min-width: 1440px) {
-        font-size: 50px;
+        font-size: 100px;
     }
 `;
 
